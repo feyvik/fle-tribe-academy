@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+
+/*
+  FLE TRIBE brand
+  Primary:   Chrysler blue #3f09c9 (brand) · Raisin black #2a292c (ink)
+  Secondary: Lime #b6ff00 · Coral #e0524f
+  Colors live in CSS variables so light/dark switch in one place; Tailwind reads them through @theme.
+*/
+:root {
+  --brand-hex: #3f09c9;
+  --ink-hex: #2a292c;
+  --lime-hex: #b6ff00;
+  --coral-hex: #e0524f;
+
+  --bg: #f6f5f9;
+  --surface: #ffffff;
+  --sunk: #ecebf2;
+  --line: #dcdae6;
+  --fg: var(--ink-hex);
+  --muted: #5f5d68;
+  --accent: var(--brand-hex);       /* study days, links, primary buttons */
+  --accent-soft: #ebe4fd;
+  --on-accent: #ffffff;
+  --fri: #c23a37;                   /* assignment day: coral, darkened for text contrast */
+  --fri-soft: #fde7e6;
+  --sat: var(--ink-hex);            /* review day: ink text on lime */
+  --sat-soft: #efffc7;
+  --lime: var(--lime-hex);
+  --ok: #3f09c9;                    /* progress */
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151418;
+    --surface: #1e1d23;
+    --sunk: #28262f;
+    --line: #36343f;
+    --fg: #ecebf1;
+    --muted: #a3a1ad;
+    --accent: #a98bff;
+    --accent-soft: #2a1d55;
+    --on-accent: #ffffff;
+    --fri: #f07b78;
+    --fri-soft: #3a1f1f;
+    --sat: var(--lime-hex);
+    --sat-soft: #262f12;
+    --ok: var(--lime-hex);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-fri: var(--fri);
+  --color-fri-soft: var(--fri-soft);
+  --color-sat: var(--sat);
+  --color-sat-soft: var(--sat-soft);
+  --color-ok: var(--ok);
+  --color-lime: var(--lime);
+  --color-brand: var(--brand-hex);
+  --color-ink: var(--ink-hex);
+  --color-coral: var(--coral-hex);
+
+  --font-display: 'Montserrat', 'Avenir Next', system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --font-cert: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-cert-body: 'Carlito', Calibri, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  #root { min-height: 100vh; }
+  h1, h2, h3, h4 {
+    @apply font-display;
+    text-wrap: balance;
+    line-height: 1.15;
+  }
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+  /* Inline code coming from the curriculum text */
+  .rich code {
+    @apply font-mono text-[0.85em] bg-sunk px-1.5 py-px rounded;
+  }
+}
+
+@utility eyebrow {
+  @apply font-mono text-xs font-semibold uppercase tracking-[0.08em] text-muted;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Printing a certificate: only the certificate itself, on one A4 landscape page. */
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  body { background: #fff !important; }
+  .no-print { display: none !important; }
+}
