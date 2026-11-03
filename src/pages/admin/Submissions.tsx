@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Submission } from '../../data/models';
 import { errorText, supabase } from '../../lib/supabase';
 import { SubmissionReview } from './shared';
+import { PageHeader } from '../../components/PageHeader';
 
 type Row = Submission & { profiles: { full_name: string } | null };
 
@@ -24,19 +25,17 @@ export default function Submissions() {
     });
   }, [status]);
 
-  const tab = (active: boolean) => `rounded-md px-3 py-1.5 ${active ? 'bg-brand text-white' : 'text-muted'}`;
+  const tab = (active: boolean) => `rounded-md px-3 py-1.5 ${active ? 'bg-lime text-ink' : 'text-white/80 hover:text-white'}`;
   return (
     <>
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Submissions</h1>
-          <p className="mt-1 text-muted">Answers, assignments and reflections from students. Feedback appears on the student's lesson.</p>
-        </div>
-        <div className="flex rounded-lg border border-line bg-surface p-1 text-sm font-semibold" role="group" aria-label="Filter">
+      <PageHeader eyebrow="Admin" title="Submissions" actions={
+        <div className="flex rounded-lg bg-white/10 p-1 text-sm font-semibold" role="group" aria-label="Filter">
           <button type="button" onClick={() => setStatus('pending')} className={tab(status === 'pending')}>Needs review</button>
           <button type="button" onClick={() => setStatus('all')} className={tab(status === 'all')}>All</button>
         </div>
-      </header>
+      }>
+        Answers, assignments and reflections from students. Feedback appears on the student's lesson.
+      </PageHeader>
 
       {loading ? (
         <p className="text-muted">Loading submissions…</p>

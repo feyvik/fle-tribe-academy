@@ -86,9 +86,9 @@ export function SubmissionForm({
   const showForm = isAdmin || editing;
 
   return (
-    <section className="rounded-xl border border-line bg-surface p-5 sm:p-6" aria-labelledby="answers-heading">
+    <section className="rounded-xl border-t-4 border-lime bg-surface p-5 shadow-sm ring-1 ring-line sm:p-6" aria-labelledby="answers-heading">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h2 id="answers-heading" className="text-xl font-bold">{heading}</h2>
+        <h2 id="answers-heading" className="text-2xl font-extrabold text-accent">{heading}</h2>
         {submission && !isAdmin && (
           <span className={`rounded-full px-3 py-1 text-xs font-bold ${submission.reviewed_at ? 'bg-lime text-ink' : 'bg-accent-soft text-accent'}`}>
             {submission.reviewed_at ? 'Reviewed' : 'Submitted · awaiting review'}

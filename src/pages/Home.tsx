@@ -26,7 +26,7 @@ export default function Home() {
         <div className="relative overflow-clip rounded-2xl bg-brand px-6 pb-9 pt-8 text-white sm:px-10 sm:pb-12 sm:pt-11">
           <span className="absolute left-0 top-0 h-3 w-28 rounded-br-full bg-lime sm:w-44" aria-hidden="true" />
           <span className="absolute bottom-0 right-0 h-3 w-28 rounded-tl-full bg-lime sm:w-44" aria-hidden="true" />
-          <Logo variant="icon" tone="white" className="pointer-events-none absolute -right-10 -top-6 h-64 opacity-[0.07] sm:h-80" />
+          <Logo variant="icon" tone="white" decorative className="pointer-events-none absolute -right-10 -top-6 h-64 opacity-[0.07] sm:h-80" />
           <div className="relative grid gap-5">
             <div className="font-mono text-xs font-semibold uppercase tracking-[0.1em] text-lime">FLE TRIBE · Frontend Developer Program</div>
             <h1 className="max-w-[20ch] text-4xl font-extrabold tracking-tight sm:text-6xl">

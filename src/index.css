@@ -27,6 +27,17 @@
   --sat-soft: #efffc7;
   --lime: var(--lime-hex);
   --ok: #3f09c9;                    /* progress */
+  /* Sidebar: soft lavender, purple only for the active week */
+  --side-bg: #f1edfc;
+  --side-fg: #2a292c;
+  --side-muted: #6b6878;
+  --side-label: #3f09c9;
+  --side-card: #ffffff;
+  --side-hover: #e4dcfa;
+  --side-active-bg: #3f09c9;
+  --side-active-fg: #ffffff;
+  --side-done: #3f09c9;
+  --side-line: #dcd3f7;
   color-scheme: light;
 }
 
@@ -46,6 +57,16 @@
     --sat: var(--lime-hex);
     --sat-soft: #262f12;
     --ok: var(--lime-hex);
+    --side-bg: #1b1730;
+    --side-fg: #ecebf1;
+    --side-muted: #a49fbd;
+    --side-label: #b6ff00;
+    --side-card: #262140;
+    --side-hover: #2c2648;
+    --side-active-bg: #b6ff00;
+    --side-active-fg: #2a292c;
+    --side-done: #b6ff00;
+    --side-line: #322b52;
     color-scheme: dark;
   }
 }
@@ -69,6 +90,16 @@
   --color-brand: var(--brand-hex);
   --color-ink: var(--ink-hex);
   --color-coral: var(--coral-hex);
+  --color-side: var(--side-bg);
+  --color-side-fg: var(--side-fg);
+  --color-side-muted: var(--side-muted);
+  --color-side-label: var(--side-label);
+  --color-side-card: var(--side-card);
+  --color-side-hover: var(--side-hover);
+  --color-side-active: var(--side-active-bg);
+  --color-side-active-fg: var(--side-active-fg);
+  --color-side-done: var(--side-done);
+  --color-side-line: var(--side-line);
 
   --font-display: 'Montserrat', 'Avenir Next', system-ui, sans-serif;
   --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;

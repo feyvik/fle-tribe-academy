@@ -55,6 +55,7 @@ export default function Login() {
         <Logo
           variant="icon"
           tone="white"
+          decorative
           className="pointer-events-none absolute -bottom-24 -right-24 h-120 opacity-[0.06]"
         />
 
@@ -74,7 +75,11 @@ export default function Login() {
             </p>
           </div>
           <img
-            src="/brand/login-photo.png"
+            src="/brand/login-photo.jpg"
+            width={560}
+            height={560}
+            fetchPriority="high"
+            decoding="async"
             alt="FLE TRIBE students learning together on laptops. Forge, Learn, Evolve."
             className="hidden min-h-0 w-full max-w-lg shrink object-contain object-left lg:block"
           />

@@ -27,7 +27,7 @@
   justify-content: space-between;
   padding: 0 10cqw;
 }
-.cert-logo { height: 7cqw; }
+.cert-logo { height: 7cqw; width: auto; }
 .cert-partner { height: 6cqw; width: auto; object-fit: contain; }
 
 /* Purple band with a faint lattice, like the printed certificate */
