@@ -5,6 +5,7 @@ import { SAMPLE_CERTIFICATE } from '../data/certificates';
 import type { Certificate } from '../data/models';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
+import { PageHeader } from '../components/PageHeader';
 
 /** The student's own certificate (once issued), how to earn it, and a lookup by number. */
 export default function Certificates() {
@@ -27,14 +28,10 @@ export default function Certificates() {
 
   return (
     <>
-      <header className="mb-8 grid gap-3">
-        <div className="eyebrow">After the program</div>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">Certificate of completion</h1>
-        <p className="max-w-[64ch] text-muted">
-          Every student who completes the Frontend Developer Program receives a FLE TRIBE certificate with its own certificate number.
-          Anyone can open the certificate link to confirm it is genuine.
-        </p>
-      </header>
+      <PageHeader eyebrow="After the program" title="Certificate of completion">
+        Every student who completes the Frontend Developer Program receives a FLE TRIBE certificate with its own certificate number.
+        Anyone can open the certificate link to confirm it is genuine.
+      </PageHeader>
 
       {mine.map((c) => (
         <section key={c.number} className="mb-8 rounded-2xl bg-brand p-6 text-white">

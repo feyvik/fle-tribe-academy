@@ -4,6 +4,7 @@ import { Orientation } from '../components/Orientation';
 import type { DayKey } from '../data/models';
 import { DAY_NAMES, getWeek, weekLabel, weekOrder, weekHeading } from '../lib/course';
 import { useProgress } from '../lib/progress';
+import { PageHeader } from '../components/PageHeader';
 
 export default function WeekPage() {
   const { weekId = '' } = useParams();
@@ -34,16 +35,14 @@ export default function WeekPage() {
     { day: 'fri', tone: 'fri', eyebrow: 'Assignment · due 23:59', title: w.assignment.title, detail: w.assignment.brief },
     { day: 'sat', tone: 'sat', eyebrow: 'Weekly review', title: 'Progress & challenges', detail: `${w.review.questions.length} reflection questions` },
   ];
-  const rowBg = { study: 'border border-line bg-surface', fri: 'bg-fri-soft', sat: 'bg-sat-soft' };
-  const dayColor = { study: 'text-accent', fri: 'text-fri', sat: 'text-sat' };
+  const rowBg = { study: 'border border-line bg-surface shadow-sm', fri: 'border border-transparent bg-fri-soft', sat: 'border border-transparent bg-sat-soft' };
+  const dayPill = { study: 'bg-brand text-white', fri: 'bg-[#c23a37] text-white', sat: 'bg-lime text-ink' };
 
   return (
     <>
-      <header className="mb-8 grid gap-3">
-        <div className="eyebrow">{w.track === 'bonus' ? 'Bonus course · opens after the main course' : `Week ${w.number}`}</div>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">{w.title}</h1>
-        <div className="max-w-[70ch] border-l-[3px] border-accent py-1 pl-4"><b>By Saturday you can:</b> {w.goal}</div>
-      </header>
+      <PageHeader eyebrow={w.track === 'bonus' ? 'Optional bonus course · opens after the main course' : `Week ${w.number}`} title={w.title}>
+        <b className="text-white">{w.track === 'bonus' ? 'By the end you can:' : 'By Saturday you can:'}</b> {w.goal}
+      </PageHeader>
 
       {!progress.weekUnlocked(w.id) && (
         <p className="mb-6 rounded-lg bg-sunk px-4 py-3 text-sm font-semibold">🔒 This week opens once you've submitted everything in the week before it.</p>
@@ -61,7 +60,7 @@ export default function WeekPage() {
           );
           return (
             <li key={row.day} className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-xl p-4 sm:grid-cols-[96px_minmax(0,1fr)_auto] ${rowBg[row.tone]} ${open ? '' : 'opacity-60'}`}>
-              <span className={`font-mono text-[13px] font-semibold tracking-wider ${dayColor[row.tone]}`}>{row.day.toUpperCase()}</span>
+              <span className={`w-14 rounded-md py-1 text-center font-mono text-xs font-bold tracking-wider ${dayPill[row.tone]}`}>{row.day.toUpperCase()}</span>
               {open ? <Link to={row.day} className="group min-w-0">{text}</Link> : <div className="min-w-0">{text}</div>}
               <div className="col-span-2 sm:col-span-1">
                 {progress.isDone(w.id, row.day) ? (

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { useProgress } from '../lib/progress';
 import { errorText, supabase } from '../lib/supabase';
+import { PageHeader } from '../components/PageHeader';
 
 /** The signed-in person's profile: their name (as printed on the certificate), email, password and progress. */
 export default function Profile() {
@@ -40,10 +41,7 @@ export default function Profile() {
   const unchanged = name.trim().replace(/\s+/g, ' ') === profile.full_name;
   return (
     <>
-      <header className="mb-8 grid gap-2">
-        <div className="eyebrow">Your account</div>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">Profile</h1>
-      </header>
+      <PageHeader eyebrow="Your account" title={profile.full_name}>{profile.email}</PageHeader>
 
       <div className="grid max-w-3xl gap-6">
         <section className="rounded-xl border border-line bg-surface p-6">

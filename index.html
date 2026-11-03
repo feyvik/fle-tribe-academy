@@ -2,16 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#3f09c9" />
     <title>FLE TRIBE · Frontend Developer Program</title>
+    <meta name="description" content="FLE TRIBE's 5-month Frontend Developer Program: learn HTML, CSS, Bootstrap, JavaScript and React step by step, build real projects, and ship your app live on Vercel." />
+    <meta name="theme-color" content="#3f09c9" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/brand/icon.png" />
+    <link rel="canonical" href="__SITE_URL__/" />
+
+    <!-- Link previews (WhatsApp, LinkedIn, Facebook, X). __SITE_URL__ is filled in at build time (see vite.config.ts). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FLE TRIBE" />
+    <meta property="og:title" content="FLE TRIBE · Frontend Developer Program" />
+    <meta property="og:description" content="From &quot;what is a browser?&quot; to shipping a React app in 5 months: HTML, CSS, Bootstrap, JavaScript and React." />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <meta property="og:image" content="__SITE_URL__/brand/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="FLE TRIBE Frontend Developer Program: students learning together. Forge, Learn, Evolve." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FLE TRIBE · Frontend Developer Program" />
+    <meta name="twitter:description" content="From &quot;what is a browser?&quot; to shipping a React app in 5 months." />
+    <meta name="twitter:image" content="__SITE_URL__/brand/og-image.jpg" />
+
+    <!-- Connect early to the servers every page needs -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Montserrat + Plus Jakarta Sans: FLE TRIBE brand fonts. Cinzel + Carlito: web stand-ins for Trajan Pro + Calibri on the certificate. -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Cinzel:wght@400;700&family=Carlito:wght@400;700&display=swap" />
+    <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
+    <!-- Montserrat + Plus Jakarta Sans: FLE TRIBE brand fonts. The certificate's fonts load only when a certificate is shown. -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" />
   </head>
   <body>
+    <noscript>FLE TRIBE's learning app needs JavaScript. Please turn it on to sign in.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

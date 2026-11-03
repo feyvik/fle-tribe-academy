@@ -5,6 +5,7 @@ import { SubmissionForm } from '../components/SubmissionForm';
 import type { DayKey } from '../data/models';
 import { DAY_KEYS, DAY_NAMES, dayLabel, getWeek, neighbour, weekHeading } from '../lib/course';
 import { useProgress } from '../lib/progress';
+import { PageHeader } from '../components/PageHeader';
 
 /** One day of a week: a study lesson (Mon–Thu), the Friday assignment, or the Saturday review. */
 export default function LessonPage() {
@@ -47,23 +48,20 @@ export default function LessonPage() {
         </div>
       ) : lesson ? (
         <>
-          <header className="mb-6 grid gap-2">
-            <div className="font-mono text-[13px] font-semibold tracking-wider text-accent">{day.toUpperCase()} · RESEARCH &amp; LEARN</div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">{lesson.title}</h1>
-          </header>
+          <PageHeader eyebrow={`${DAY_NAMES[day]} · Research & learn`} title={lesson.title} />
           <MediaPlayer media={media} />
           <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
-            <section className="rich">
-              <h2 className="eyebrow mb-3">Learn</h2>
+            <section className="rich rounded-xl border border-line bg-surface p-6 shadow-sm">
+              <h2 className="mb-3 text-lg font-bold text-accent">What you'll learn</h2>
               <ul className="list-disc space-y-1.5 pl-5">
                 {lesson.learn.map((item, i) => <li key={i} dangerouslySetInnerHTML={{ __html: item }} />)}
               </ul>
             </section>
-            <aside className="rounded-xl border border-line bg-surface p-5 self-start">
-              <h2 className="eyebrow mb-3">Start your research here</h2>
+            <aside className="self-start rounded-xl bg-brand p-5 text-white">
+              <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-lime">Start your research here</h2>
               <ul className="grid gap-2">
                 {lesson.resources.map((r) => (
-                  <li key={r.url}><a href={r.url} target="_blank" rel="noopener" className="font-semibold text-accent hover:underline">{r.label} ↗</a></li>
+                  <li key={r.url}><a href={r.url} target="_blank" rel="noopener" className="font-semibold text-white underline decoration-lime decoration-2 underline-offset-4 hover:text-lime">{r.label} ↗</a></li>
                 ))}
               </ul>
             </aside>
@@ -72,11 +70,7 @@ export default function LessonPage() {
         </>
       ) : day === 'fri' ? (
         <>
-          <header className="mb-6 grid gap-2">
-            <div className="font-mono text-[13px] font-semibold tracking-wider text-fri">FRI · ASSIGNMENT · DUE 23:59</div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">{w.assignment.title}</h1>
-            <p className="max-w-[65ch] text-lg">{w.assignment.brief}</p>
-          </header>
+          <PageHeader tone="coral" eyebrow="Friday · Assignment · due 23:59" title={w.assignment.title}>{w.assignment.brief}</PageHeader>
           {media && <div className="mb-8"><MediaPlayer media={media} /></div>}
           <div className="rich grid gap-6 rounded-xl bg-fri-soft p-6">
             <section>
@@ -97,11 +91,9 @@ export default function LessonPage() {
         </>
       ) : (
         <>
-          <header className="mb-6 grid gap-2">
-            <div className="font-mono text-[13px] font-semibold tracking-wider text-sat">SAT · WEEKLY REVIEW</div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">Progress &amp; challenges</h1>
-            <p className="max-w-[65ch] text-lg">Bring your submission and your journal. Each student shares what they built, one blocker and one win.</p>
-          </header>
+          <PageHeader tone="ink" eyebrow="Saturday · Weekly review" title="Progress & challenges">
+            Bring your submission and your journal. Each student shares what they built, one blocker and one win.
+          </PageHeader>
           <div className="rounded-xl bg-sat-soft p-6">
             <h2 className="eyebrow mb-3 !text-sat">Prepare</h2>
             <ul className="list-disc space-y-1 pl-5">

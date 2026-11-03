@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import type { StudentSummary } from '../../data/models';
 import { mainDays, certificateDate } from '../../lib/course';
 import { errorText, supabase } from '../../lib/supabase';
+import { PageHeader } from '../../components/PageHeader';
 
 interface IssuedRow {
   number: string;
@@ -61,10 +62,9 @@ export default function CertificatesAdmin() {
   const field = 'rounded-lg border border-line bg-bg px-3 py-2.5';
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-3xl font-extrabold tracking-tight">Certificates</h1>
-        <p className="mt-1 text-muted">Issue a certificate once a student passes the final review. It appears on their certificate page straight away.</p>
-      </header>
+      <PageHeader eyebrow="Admin" title="Certificates">
+        Issue a certificate once a student completes the main course. It appears on their certificate page straight away.
+      </PageHeader>
 
       <section className="mb-8 rounded-xl border border-line bg-surface p-5">
         <h2 className="mb-4 text-lg font-bold">Issue a certificate</h2>

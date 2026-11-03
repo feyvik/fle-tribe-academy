@@ -1,0 +1,10 @@
+# FLE TRIBE learning app. Only the sign-in page and public certificate checks are meant for search engines;
+# everything else is behind a login.
+User-agent: *
+Allow: /login
+Allow: /verify/
+Disallow: /admin
+Disallow: /weeks/
+Disallow: /profile
+Disallow: /certificates
+Disallow: /change-password

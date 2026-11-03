@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { LessonMedia } from '../../data/models';
 import { getWeek, shortLabel, weekHeading, weekOrder } from '../../lib/course';
 import { MEDIA_BUCKET, errorText, supabase } from '../../lib/supabase';
+import { PageHeader } from '../../components/PageHeader';
 
 const ALLOWED: Record<string, { kind: 'video' | 'pdf'; ext: string }> = {
   'application/pdf': { kind: 'pdf', ext: 'pdf' },
@@ -37,10 +38,9 @@ export default function Content() {
 
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-3xl font-extrabold tracking-tight">Lesson media</h1>
-        <p className="mt-1 text-muted">Each lesson shows one YouTube video, uploaded video or PDF. Fridays can carry the assignment brief.</p>
-      </header>
+      <PageHeader eyebrow="Admin" title="Lesson media">
+        Each lesson shows one YouTube video, uploaded video or PDF. Fridays can carry the assignment brief.
+      </PageHeader>
 
       <div className="mb-6 flex flex-wrap gap-1.5" role="tablist" aria-label="Weeks">
         {weekOrder.map((id) => {

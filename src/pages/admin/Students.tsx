@@ -4,6 +4,7 @@ import type { StudentSummary } from '../../data/models';
 import { mainDays, formatDateTime } from '../../lib/course';
 import { adminUsers, errorText, supabase } from '../../lib/supabase';
 import { CredentialsCard, type SignInDetails } from './shared';
+import { PageHeader } from '../../components/PageHeader';
 
 /** Add students (there is no public sign-up) and see everyone's progress. */
 export default function Students() {
@@ -65,10 +66,9 @@ export default function Students() {
   const field = 'rounded-lg border border-line bg-bg px-3 py-2.5';
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-3xl font-extrabold tracking-tight">Students</h1>
-        <p className="mt-1 text-muted">There's no public sign-up. Add each student here and send them their sign-in details.</p>
-      </header>
+      <PageHeader eyebrow="Admin" title="Students">
+        There's no public sign-up. Add each student here and send them their sign-in details.
+      </PageHeader>
 
       <section className="mb-8 rounded-xl border border-line bg-surface p-5">
         <h2 className="mb-4 text-lg font-bold">Add a student</h2>
@@ -94,7 +94,14 @@ export default function Students() {
         </div>
       )}
 
-      <h2 className="mb-3 text-lg font-bold">All students <span className="text-muted">({students.length})</span></h2>
+      <h2 className="mb-3 text-lg font-bold">
+        All students <span className="text-muted">({students.length})</span>
+        {students.some((s) => s.completed >= mainDays.length) && (
+          <span className="ml-2 text-sm font-semibold text-muted">
+            · {students.filter((s) => s.completed >= mainDays.length).length} completed the course
+          </span>
+        )}
+      </h2>
       {loading ? (
         <p className="text-muted">Loading students…</p>
       ) : loadError ? (
@@ -126,10 +133,15 @@ export default function Students() {
                   </td>
                   <td className="px-4 py-3 text-sm">{formatDateTime(s.last_submitted_at)}</td>
                   <td className="px-4 py-3 text-sm">
-                    {s.must_change_password ? (
+                    {s.completed >= mainDays.length ? (
+                      <Link to="/admin/certificates" className="rounded-full bg-lime px-2.5 py-1 text-xs font-bold text-ink hover:brightness-95"
+                            title="Every main-course day is submitted. Issue their certificate.">
+                        Course complete ✓
+                      </Link>
+                    ) : s.must_change_password ? (
                       <span className="rounded-full bg-fri-soft px-2.5 py-1 text-xs font-bold text-fri">Hasn't signed in yet</span>
                     ) : (
-                      <span className="rounded-full bg-sat-soft px-2.5 py-1 text-xs font-bold text-sat">Active</span>
+                      <span className="rounded-full bg-sat-soft px-2.5 py-1 text-xs font-bold text-sat">In progress</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right text-sm font-semibold">

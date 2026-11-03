@@ -41,16 +41,7 @@ export function MediaPlayer({ media }: { media?: LessonMedia }) {
       <figure className="m-0">
         {media.title && <figcaption className="mb-2 font-semibold">{media.title}</figcaption>}
         {id ? (
-          <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
-            <iframe
-              className="h-full w-full"
-              src={`https://www.youtube-nocookie.com/embed/${id}?rel=0`}
-              title={media.title || 'Lesson video'}
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
-          </div>
+          <YouTubeVideo id={id} title={media.title || 'Lesson video'} />
         ) : (
           <p className="rounded-xl border border-fri bg-fri-soft p-4 text-sm">
             This lesson's YouTube link can't be played. An admin needs to update it under Admin → Lesson media.
@@ -85,8 +76,40 @@ export function MediaPlayer({ media }: { media?: LessonMedia }) {
           <a href={`${fileUrl}&download=`} className="rounded-lg bg-fg px-3 py-1.5 text-bg hover:opacity-90">Download</a>
         </div>
       </div>
-      <iframe className="h-[75vh] min-h-[420px] w-full rounded-xl border border-line bg-surface" src={`${fileUrl}#view=FitH`} title={media.title || 'Lesson PDF'} />
+      <iframe loading="lazy" className="h-[75vh] min-h-[420px] w-full rounded-xl border border-line bg-surface" src={`${fileUrl}#view=FitH`} title={media.title || 'Lesson PDF'} />
       <p className="mt-2 text-sm text-muted">If the PDF doesn't show on your phone, use "Open in new tab".</p>
     </figure>
+  );
+}
+
+/**
+ * Shows the video's thumbnail with a play button, and only loads YouTube's player (about 1 MB) when it's clicked.
+ * Keeps lesson pages fast, especially on mobile data.
+ */
+function YouTubeVideo({ id, title }: { id: string; title: string }) {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
+      {playing ? (
+        <iframe
+          className="h-full w-full"
+          src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`}
+          title={title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      ) : (
+        <button type="button" onClick={() => setPlaying(true)} className="group absolute inset-0 grid place-items-center"
+                aria-label={`Play video: ${title}`}>
+          <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" decoding="async"
+               width={480} height={360} className="absolute inset-0 h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100" />
+          <span className="relative grid size-16 place-items-center rounded-full bg-brand text-white shadow-lg ring-4 ring-white/30 transition-transform group-hover:scale-110 sm:size-20"
+                aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="ml-1 size-8 fill-current sm:size-10"><path d="M8 5v14l11-7z" /></svg>
+          </span>
+        </button>
+      )}
+    </div>
   );
 }
