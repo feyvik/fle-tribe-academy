@@ -149,3 +149,6 @@ end $$;
 
 -- Certificates can only be created through issue_certificate (no direct inserts).
 revoke insert on public.certificates from authenticated, anon;
+
+-- Make the new columns and functions available to the app straight away.
+notify pgrst, 'reload schema';

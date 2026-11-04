@@ -95,8 +95,13 @@ export default function Login() {
           <div className="w-full max-w-sm">
             <ThemedLogo className="mb-10 hidden h-12 lg:block" />
             <h1 className="text-3xl font-extrabold tracking-tight">Sign in</h1>
-            <p className="mt-2 text-muted">
-              Use the email and password FLE TRIBE sent you.
+
+            <p className="mt-8 text-sm text-muted">
+              Accounts are created by FLE TRIBE when you join the program and
+              sent to your email. If you haven't received your account details,
+              contact <a href="mailto:support@fletribe.org" className="text-accent underline hover:no-underline">
+                support@fletribe.org
+              </a>
             </p>
 
             {!supabaseConfigured && (
@@ -159,12 +164,6 @@ export default function Login() {
                 {busy ? "Signing in…" : "Sign in"}
               </button>
             </form>
-
-            <p className="mt-8 text-sm text-muted">
-              No account yet? Accounts are created by FLE TRIBE when you join
-              the program. Forgot your password? Ask your program admin to reset
-              it.
-            </p>
           </div>
         </div>
       </main>

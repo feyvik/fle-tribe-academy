@@ -3,9 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { Certificate, Profile, Submission } from '../../data/models';
 import { allDays, formatDateTime, isBonus, lessonInfo, lessonKey, mainDays } from '../../lib/course';
 import { adminUsers, errorText, supabase } from '../../lib/supabase';
-import { CredentialsCard, SubmissionReview, type SignInDetails } from './shared';
+import { SubmissionReview } from './shared';
 
-/** One student: progress, all their answers with feedback, password reset and removal. */
+/** One student: progress, all their answers with feedback, and removal. */
 export default function StudentDetail() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ export default function StudentDetail() {
   const [subs, setSubs] = useState<Submission[]>([]);
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [error, setError] = useState('');
-  const [credentials, setCredentials] = useState<SignInDetails | null>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -36,18 +35,6 @@ export default function StudentDetail() {
     const next = allDays.find((d) => !done.has(lessonKey(d.weekId, d.day)));
     return next ? lessonInfo(lessonKey(next.weekId, next.day)) : null;
   }, [subs]);
-
-  async function reset() {
-    setBusy(true);
-    try {
-      setCredentials(await adminUsers<SignInDetails>({ action: 'reset', userId: id }));
-      setStudent((s) => s && { ...s, must_change_password: true });
-    } catch (err) {
-      setError(errorText(err));
-    } finally {
-      setBusy(false);
-    }
-  }
 
   async function remove() {
     setBusy(true);
@@ -73,7 +60,6 @@ export default function StudentDetail() {
               <p className="mt-1 text-muted">{student.email} · added {formatDateTime(student.created_at)}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={reset} disabled={busy} className={button}>Reset password</button>
               <Link to={`/admin/certificates?student=${student.id}`} className={button}>Issue certificate</Link>
               {!confirmRemove && (
                 <button type="button" onClick={() => setConfirmRemove(true)} className="rounded-lg px-4 py-2 text-sm font-semibold text-fri hover:bg-fri-soft">
@@ -93,9 +79,6 @@ export default function StudentDetail() {
             </div>
           )}
 
-          {credentials && (
-            <div className="mb-6"><CredentialsCard details={credentials} heading="New sign-in details" onClose={() => setCredentials(null)} /></div>
-          )}
 
           <section className="mb-8 grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-line bg-surface p-4">

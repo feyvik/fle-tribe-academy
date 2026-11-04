@@ -1,12 +1,15 @@
-// Admin-only account management. Creating users needs the service role key, which must never reach the browser,
+// Account management and emails. Everything is admin-only except password_changed. Creating users needs the service role key, which must never reach the browser,
 // so it lives in this Edge Function. Deploy with:  supabase functions deploy admin-users
 //
 // POST { action: 'create', fullName, email }  → creates a student with a temporary password
-// POST { action: 'reset', userId }            → sets a new temporary password
 // POST { action: 'delete', userId }           → removes the student and all their answers
-// Optional secret APP_URL (supabase secrets set APP_URL=https://…) is used in the sign-in message.
+// POST { action: 'password_changed' }         → any signed-in person: confirms their own password change by email
+// POST { action: 'send_certificate', userId, resend? } → emails the student's certificate, if they have one and it hasn't gone out
+// Secret APP_URL (your live https:// address) is used in the sign-in message.
+// Secrets RESEND_API_KEY and EMAIL_FROM turn on emailing the details; without them the admin copies the message instead.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { sendCertificateEmail, sendPasswordChangedEmail, sendSignInEmail, SUPPORT_EMAIL } from './email.ts';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -24,22 +27,36 @@ function tempPassword() {
   return `${words[r[0] % words.length]}-${1000 + (r[1] % 9000)}-${words[r[2] % words.length]}`;
 }
 
-function signInMessage(name: string, email: string, password: string, appUrl: string, isReset: boolean) {
+function signInMessage(name: string, email: string, password: string, appUrl: string) {
   return [
     `Hi ${name},`,
     '',
-    isReset
-      ? 'Your FLE TRIBE password has been reset. Here are your new sign-in details:'
-      : 'Welcome to the FLE TRIBE Frontend Developer Program. Here are your sign-in details:',
+    'Welcome to the FLE TRIBE Frontend Developer Program. Here are your sign-in details:',
     '',
     `Sign in at: ${appUrl}/login`,
     `Email: ${email}`,
     `Temporary password: ${password}`,
     '',
     "You'll be asked to choose your own password the first time you sign in.",
+    `Need help? Write to ${SUPPORT_EMAIL}.`,
     '',
     'FLE TRIBE',
   ].join('\n');
+}
+
+/** Builds the sign-in message and tries to email it. The admin always gets the message back in case the email fails. */
+async function deliverSignIn(name: string, email: string, password: string, appUrl: string) {
+  const message = signInMessage(name, email, password, appUrl);
+  const { sent, problem } = await sendSignInEmail({
+    apiKey: Deno.env.get('RESEND_API_KEY'),
+    from: Deno.env.get('EMAIL_FROM'),
+    to: email,
+    name,
+    password,
+    appUrl,
+    text: message,
+  });
+  return { password, message, emailed: sent, emailProblem: problem };
 }
 
 Deno.serve(async (req) => {
@@ -53,11 +70,24 @@ Deno.serve(async (req) => {
   const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '');
   const { data: caller } = await admin.auth.getUser(token);
   if (!caller?.user) return json({ error: 'Please sign in.' }, 401);
-  const { data: me } = await admin.from('profiles').select('role').eq('id', caller.user.id).single();
-  if (me?.role !== 'admin') return json({ error: 'Admins only.' }, 403);
-
   const body = await req.json().catch(() => ({}));
   const appUrl = (Deno.env.get('APP_URL') ?? req.headers.get('origin') ?? '').replace(/\/$/, '');
+  const { data: me } = await admin.from('profiles').select('role, full_name, email').eq('id', caller.user.id).single();
+
+  // Always goes to the signed-in person's own address, so it can't be used to email anyone else.
+  if (body.action === 'password_changed') {
+    if (!me) return json({ error: 'Profile not found.' }, 404);
+    const { sent, problem } = await sendPasswordChangedEmail({
+      apiKey: Deno.env.get('RESEND_API_KEY'),
+      from: Deno.env.get('EMAIL_FROM'),
+      to: me.email,
+      name: me.full_name,
+      appUrl,
+    });
+    return json({ emailed: sent, emailProblem: problem });
+  }
+
+  if (me?.role !== 'admin') return json({ error: 'Admins only.' }, 403);
 
   if (body.action === 'create') {
     const fullName = String(body.fullName ?? '').trim();
@@ -76,23 +106,36 @@ Deno.serve(async (req) => {
       const taken = /already|registered|exists/i.test(error.message);
       return json({ error: taken ? 'There is already an account with that email.' : error.message }, taken ? 409 : 400);
     }
-    return json({ userId: data.user.id, password, message: signInMessage(fullName, email, password, appUrl, false) }, 201);
+    return json({ userId: data.user.id, ...(await deliverSignIn(fullName, email, password, appUrl)) }, 201);
   }
 
-  if (body.action === 'reset' || body.action === 'delete') {
-    const { data: student } = await admin.from('profiles').select('*').eq('id', body.userId).eq('role', 'student').single();
-    if (!student) return json({ error: 'Student not found.' }, 404);
-
-    if (body.action === 'delete') {
-      const { error } = await admin.auth.admin.deleteUser(student.id);
-      return error ? json({ error: error.message }, 400) : json({ ok: true });
-    }
-
-    const password = tempPassword();
-    const { error } = await admin.auth.admin.updateUserById(student.id, { password });
+  if (body.action === 'send_certificate') {
+    const { data: cert, error } = await admin.from('certificates')
+      .select('number, full_name, issued_on, emailed_at').eq('user_id', body.userId).maybeSingle();
     if (error) return json({ error: error.message }, 400);
-    await admin.from('profiles').update({ must_change_password: true }).eq('id', student.id);
-    return json({ password, message: signInMessage(student.full_name, student.email, password, appUrl, true) });
+    if (!cert) return json({ issued: false });
+    if (cert.emailed_at && !body.resend) return json({ issued: true, number: cert.number, alreadySent: true, emailed: true });
+
+    const { data: student } = await admin.from('profiles').select('email').eq('id', body.userId).single();
+    if (!student) return json({ error: 'Student not found.' }, 404);
+    const { sent, problem } = await sendCertificateEmail({
+      apiKey: Deno.env.get('RESEND_API_KEY'),
+      from: Deno.env.get('EMAIL_FROM'),
+      to: student.email,
+      name: cert.full_name,
+      number: cert.number,
+      issuedOn: cert.issued_on,
+      appUrl,
+    });
+    if (sent) await admin.from('certificates').update({ emailed_at: new Date().toISOString() }).eq('number', cert.number);
+    return json({ issued: true, number: cert.number, emailed: sent, emailProblem: problem });
+  }
+
+  if (body.action === 'delete') {
+    const { data: student } = await admin.from('profiles').select('id').eq('id', body.userId).eq('role', 'student').single();
+    if (!student) return json({ error: 'Student not found.' }, 404);
+    const { error } = await admin.auth.admin.deleteUser(student.id);
+    return error ? json({ error: error.message }, 400) : json({ ok: true });
   }
 
   return json({ error: 'Unknown action.' }, 400);

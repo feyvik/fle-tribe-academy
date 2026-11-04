@@ -49,7 +49,7 @@ export default function Certificates() {
             <li>Submit every lesson, assignment and reflection in the main course (Weeks 00–19). Each one unlocks the next. Bonus courses are optional.</li>
             <li>Attend the Saturday reviews and explain your work.</li>
             <li>Ship the Week 18 capstone and present it on demo day.</li>
-            <li>Pass the final review. FLE TRIBE then issues your certificate and it appears on this page.</li>
+            <li>Get feedback on all your work. Once FLE TRIBE has reviewed every day, your certificate is issued automatically, emailed to you and shown on this page.</li>
           </ol>
         </section>
         <section className="rounded-xl border border-line bg-surface p-6">

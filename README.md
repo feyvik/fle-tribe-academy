@@ -14,7 +14,8 @@ Built with **React + Vite + Tailwind CSS v4**, with **Supabase** for sign-in, th
 2. **Turn off public sign-up:** Authentication → Sign In / Providers → Email → switch off **Allow new users to sign up**.
    Accounts are created only by admins.
 3. **Create the database:** SQL Editor → paste all of `supabase/migrations/0001_fle_tribe.sql` → Run. Then do the same with
-   `0002_profile_and_completion.sql` (course structure, profiles, links, certificate rules). Both are safe to run again.
+   `0002_profile_and_completion.sql` (course structure, profiles, links, certificate rules), then `0003_auto_certificates.sql`
+   (automatic certificates once every day is reviewed). All are safe to run again.
 4. **Deploy the admin function** (it creates student accounts, so it needs the service key, which never goes in the browser):
    ```bash
    npx supabase login
@@ -43,8 +44,8 @@ npm run build    # production files in dist/
 
 | Who | Where | What |
 |---|---|---|
-| Admin | Admin → Students | Add a student (name + email). A temporary password is created and shown in a ready-to-send message (copy it to WhatsApp or email). Reset passwords and remove students from the student's page. |
-| Student | `/login` → `/change-password` | Signs in with the temporary password and must choose their own. |
+| Admin | Admin → Students | Add a student (name + email). A temporary password is created and emailed to them through Resend (needs the `RESEND_API_KEY`, `EMAIL_FROM` and `APP_URL` secrets on the Edge Function). If the email can't be sent, you get a ready-to-send message to copy instead. Remove students from the student's page. |
+| Student | `/login` → `/change-password` | Signs in with the temporary password and must choose their own, then gets an email confirming the change. |
 | Student | Lessons | Mon–Thu: answer the research questions. Fri: link to the assignment + notes. Sat: reflection questions. Submitting completes the day and unlocks the next. Answers can be edited until an admin gives feedback. |
 | Admin | Admin → Lesson media | Per lesson: paste a YouTube link, or upload a video (MP4, WebM, MOV) or PDF to Supabase Storage. |
 | Admin | Admin → Submissions | Read answers next to their questions and send feedback. |
