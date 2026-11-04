@@ -13,7 +13,6 @@ export interface SignInEmail {
   name: string;
   password: string;
   appUrl: string;
-  isReset: boolean;
   /** Plain-text version: the same message the admin can copy. */
   text: string;
 }
@@ -50,51 +49,76 @@ const detail = (label: string, value: string, mono = false) => `
   <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:${MUTED}">${label}</p>
   <p style="margin:0;font-size:${mono ? 18 : 15}px;font-weight:700;color:${INK};word-break:break-all;${mono ? "font-family:Menlo,Consolas,'Courier New',monospace;" : ''}">${escape(value)}</p>`;
 
-export function signInHtml({ to, name, password, appUrl, isReset }: SignInEmail) {
-  const loginUrl = `${appUrl}/login`;
-  const title = isReset ? 'Your password has been reset' : 'Welcome to FLE TRIBE';
-  const preview = isReset
-    ? 'Your new FLE TRIBE sign-in details are inside.'
-    : 'Your account is ready. Here’s how to sign in and start learning.';
-
-  const intro = isReset
-    ? 'Your FLE TRIBE password has been reset. Use the temporary password below to sign in, then choose a new one.'
-    : 'Your place on the FLE TRIBE <b>Frontend Developer Program</b> is ready. Over the next 5 months, you’ll go from “what is a browser?” to shipping your own React app.';
-
-  const next = isReset
-    ? `<p style="margin:24px 0 0;font-size:14px;line-height:1.5;color:${MUTED}">You’ll be asked to choose a new password as soon as you sign in. If you didn’t ask for this reset, contact us at the address below.</p>`
-    : `${heading('Getting started')}
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-        ${step(1, 'Sign in with the details above.')}
-        ${step(2, 'Choose your own password. You’ll be asked to do this straight away.')}
-        ${step(3, 'Start Week 00: <b>Tech, careers &amp; what frontend is</b>.')}
-      </table>
-      ${heading('Your weekly rhythm')}
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.45;color:${INK}">
-        <tr><td width="130" valign="top" style="padding:8px 8px 8px 0;border-top:1px solid ${LINE};font-weight:700">Mon – Thu</td><td valign="top" style="padding:8px 0;border-top:1px solid ${LINE}">Guided lessons and research</td></tr>
-        <tr><td width="130" valign="top" style="padding:8px 8px 8px 0;border-top:1px solid ${LINE};font-weight:700">Friday</td><td valign="top" style="padding:8px 0;border-top:1px solid ${LINE}">Project work</td></tr>
-        <tr><td width="130" valign="top" style="padding:8px 8px 8px 0;border-top:1px solid ${LINE};font-weight:700">Saturday</td><td valign="top" style="padding:8px 0;border-top:1px solid ${LINE}">Live review and feedback</td></tr>
-      </table>`;
-
+export function signInHtml({ to, name, password, appUrl }: SignInEmail) {
   return emailPage({
     to,
-    title,
-    preview,
+    title: 'Welcome to FLE TRIBE',
+    preview: 'Your account is ready. Here’s how to sign in and start learning.',
     appUrl,
-    reason: 'an admin created or updated a FLE TRIBE account for',
+    reason: 'an admin created a FLE TRIBE account for',
     privacyNote: 'Keep this password private and don’t share it with anyone.',
     body: `
           <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Hi ${escape(name)},</p>
-          <p style="margin:0 0 24px;font-size:15px;line-height:1.6">${intro}</p>
+          <p style="margin:0 0 24px;font-size:15px;line-height:1.6">Your place on the FLE TRIBE <b>Frontend Developer Program</b> is ready. Over the next 5 months, you’ll go from “what is a browser?” to shipping your own React app.</p>
 
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f6fb;border-radius:12px;border:1px solid ${LINE}">
             <tr><td style="padding:18px 20px 8px">${detail('Email', to)}</td></tr>
             <tr><td style="padding:10px 20px 18px">${detail('Temporary password', password, true)}</td></tr>
           </table>
 
-          ${button('Sign in to FLE TRIBE', loginUrl)}
+          ${button('Sign in to FLE TRIBE', `${appUrl}/login`)}
 
-          ${next}`,
+          ${heading('Getting started')}
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            ${step(1, 'Sign in with the details above.')}
+            ${step(2, 'Choose your own password. You’ll be asked to do this straight away.')}
+            ${step(3, 'Start Week 00: <b>Tech, careers &amp; what frontend is</b>.')}
+          </table>
+          ${heading('Your weekly rhythm')}
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.45;color:${INK}">
+            <tr><td width="130" valign="top" style="padding:8px 8px 8px 0;border-top:1px solid ${LINE};font-weight:700">Mon – Thu</td><td valign="top" style="padding:8px 0;border-top:1px solid ${LINE}">Guided lessons and research</td></tr>
+            <tr><td width="130" valign="top" style="padding:8px 8px 8px 0;border-top:1px solid ${LINE};font-weight:700">Friday</td><td valign="top" style="padding:8px 0;border-top:1px solid ${LINE}">Project work</td></tr>
+            <tr><td width="130" valign="top" style="padding:8px 8px 8px 0;border-top:1px solid ${LINE};font-weight:700">Saturday</td><td valign="top" style="padding:8px 0;border-top:1px solid ${LINE}">Live review and feedback</td></tr>
+          </table>`,
+  });
+}
+
+export interface PasswordChangedEmail {
+  apiKey?: string;
+  from?: string;
+  to: string;
+  name: string;
+  appUrl: string;
+}
+
+export function passwordChangedText({ name, appUrl }: PasswordChangedEmail) {
+  return [
+    `Hi ${name},`,
+    '',
+    'Your FLE TRIBE password was changed successfully. You can now sign in with your new password.',
+    '',
+    `Sign in at: ${appUrl}/login`,
+    '',
+    `Didn't change it? Contact us straight away at ${SUPPORT_EMAIL}.`,
+    '',
+    'FLE TRIBE',
+  ].join('\n');
+}
+
+export function passwordChangedHtml(e: PasswordChangedEmail) {
+  return emailPage({
+    to: e.to,
+    title: 'Your password was changed',
+    preview: 'Your FLE TRIBE password was changed successfully.',
+    appUrl: e.appUrl,
+    reason: 'the password was changed on the FLE TRIBE account for',
+    body: `
+          <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Hi ${escape(e.name)},</p>
+          <p style="margin:0;font-size:15px;line-height:1.6">Your FLE TRIBE password was changed successfully. You can now sign in with your new password.</p>
+
+          ${button('Go to FLE TRIBE', `${e.appUrl}/login`)}
+
+          <p style="margin:24px 0 0;font-size:15px;line-height:1.6"><b>Didn’t change it?</b> Contact us straight away using the address below.</p>`,
   });
 }
 
@@ -251,13 +275,24 @@ export const sendCertificateEmail = (e: CertificateEmail) =>
     html: certificateHtml(e),
   });
 
+export const sendPasswordChangedEmail = (e: PasswordChangedEmail) =>
+  deliver({
+    apiKey: e.apiKey,
+    from: e.from,
+    appUrl: e.appUrl,
+    to: e.to,
+    subject: 'Your FLE TRIBE password was changed',
+    text: passwordChangedText(e),
+    html: passwordChangedHtml(e),
+  });
+
 export const sendSignInEmail = (e: SignInEmail) =>
   deliver({
     apiKey: e.apiKey,
     from: e.from,
     appUrl: e.appUrl,
     to: e.to,
-    subject: e.isReset ? 'Your new FLE TRIBE sign-in details' : 'Welcome to FLE TRIBE: your sign-in details',
+    subject: 'Welcome to FLE TRIBE: your sign-in details',
     text: e.text,
     html: signInHtml(e),
   });

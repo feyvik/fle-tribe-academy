@@ -1,7 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Profile } from '../data/models';
-import { supabase } from './supabase';
+import { adminUsers, supabase } from './supabase';
 
 interface AuthState {
   session: Session | null;
@@ -69,6 +69,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const done = await supabase.rpc('password_changed');
       if (done.error) throw done.error;
       setProfile({ ...profile, must_change_password: false });
+      // Confirmation email. The password has already changed, so a failure here mustn't show as an error.
+      adminUsers({ action: 'password_changed' }).catch(() => {});
     },
     [profile],
   );
