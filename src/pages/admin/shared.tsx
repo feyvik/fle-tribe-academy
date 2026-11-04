@@ -3,15 +3,29 @@ import { Link } from 'react-router-dom';
 import { LinkList, Linkify } from '../../components/Linkify';
 import type { Submission } from '../../data/models';
 import { formatDateTime, lessonInfo } from '../../lib/course';
-import { errorText, supabase } from '../../lib/supabase';
+import { adminUsers, errorText, supabase } from '../../lib/supabase';
 
 export interface SignInDetails {
   password: string;
   /** Ready-to-send message with the sign-in link, email and temporary password. */
   message: string;
+  /** True when the details were emailed to the student. */
+  emailed?: boolean;
+  /** Why the email wasn't sent, if it wasn't. */
+  emailProblem?: string;
 }
 
-/** Shows a student's new sign-in details once, ready to copy and send (WhatsApp, email, …). */
+/** Result of asking the server to email a student's certificate. */
+export interface CertificateSend {
+  issued: boolean;
+  number?: string;
+  /** It had already been emailed, so nothing new happened. */
+  alreadySent?: boolean;
+  emailed?: boolean;
+  emailProblem?: string;
+}
+
+/** Confirms the student was emailed, or shows the details once, ready to copy and send (WhatsApp, email, …). */
 export function CredentialsCard({ details, heading, onClose }: { details: SignInDetails; heading: string; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
   async function copy() {
@@ -23,19 +37,38 @@ export function CredentialsCard({ details, heading, onClose }: { details: SignIn
       // Clipboard blocked: the text is selectable in the box.
     }
   }
+  const message = (
+    <>
+      <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-lg bg-surface p-4 font-mono text-sm">{details.message}</pre>
+      <button type="button" onClick={copy} className="mt-3 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+        {copied ? 'Copied ✓' : 'Copy message'}
+      </button>
+    </>
+  );
   return (
     <section className="rounded-xl border-2 border-brand bg-accent-soft p-5" role="status">
       <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-bold">{heading}</h3>
-          <p className="m-0 text-sm">Send this message to the student. The temporary password is only shown now.</p>
+          {details.emailed ? (
+            <p className="m-0 text-sm font-semibold">✓ Their sign-in details have been emailed to them.</p>
+          ) : (
+            <p className="m-0 text-sm">
+              {details.emailProblem && <b>The email wasn’t sent. {details.emailProblem} </b>}
+              Send this message to the student. The temporary password is only shown now.
+            </p>
+          )}
         </div>
         <button type="button" onClick={onClose} className="text-sm font-semibold text-muted hover:text-fg">Done</button>
       </div>
-      <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-lg bg-surface p-4 font-mono text-sm">{details.message}</pre>
-      <button type="button" onClick={copy} className="mt-3 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
-        {copied ? 'Copied ✓' : 'Copy message'}
-      </button>
+      {details.emailed ? (
+        <details className="mt-3 text-sm">
+          <summary className="cursor-pointer font-semibold">Didn’t arrive? Show the message to send yourself</summary>
+          {message}
+        </details>
+      ) : (
+        message
+      )}
     </section>
   );
 }
@@ -54,6 +87,7 @@ export function SubmissionReview({
   const [feedback, setFeedback] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [certificate, setCertificate] = useState<CertificateSend | null>(null);
 
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -69,6 +103,11 @@ export function SubmissionReview({
     setBusy(false);
     if (error) return setError(errorText(error));
     onReviewed(data as Submission);
+    // The database issues the certificate when this was the last review; this emails it. If the call fails,
+    // the certificate still exists and Admin → Certificates offers to send it.
+    adminUsers<CertificateSend>({ action: 'send_certificate', userId: submission.user_id })
+      .then((r) => { if (r.issued && !r.alreadySent) setCertificate(r); })
+      .catch(() => {});
   }
 
   return (
@@ -128,6 +167,15 @@ export function SubmissionReview({
             <span className="text-xs text-muted">The student sees it on the lesson. Their answers can't be edited afterwards.</span>
           </div>
         </form>
+      )}
+
+      {certificate && (
+        <p className="mt-4 rounded-lg bg-accent-soft p-4 text-sm font-semibold" role="status">
+          🎓 That completes the course. Certificate <span className="font-mono">{certificate.number}</span> has been issued
+          {certificate.emailed
+            ? ' and emailed to the student.'
+            : `, but the email wasn’t sent. ${certificate.emailProblem ?? ''} You can send it from Admin → Certificates.`}
+        </p>
       )}
     </article>
   );

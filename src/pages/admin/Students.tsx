@@ -133,10 +133,15 @@ export default function Students() {
                   </td>
                   <td className="px-4 py-3 text-sm">{formatDateTime(s.last_submitted_at)}</td>
                   <td className="px-4 py-3 text-sm">
-                    {s.completed >= mainDays.length ? (
+                    {s.reviewed >= mainDays.length ? (
                       <Link to="/admin/certificates" className="rounded-full bg-lime px-2.5 py-1 text-xs font-bold text-ink hover:brightness-95"
-                            title="Every main-course day is submitted. Issue their certificate.">
+                            title="Every main-course day has been reviewed. See their certificate.">
                         Course complete ✓
+                      </Link>
+                    ) : s.completed >= mainDays.length ? (
+                      <Link to="/admin/submissions" className="rounded-full bg-fri-soft px-2.5 py-1 text-xs font-bold text-fri hover:brightness-95"
+                            title="Their certificate is issued once every main-course day has feedback.">
+                        Reviewed {s.reviewed}/{mainDays.length}
                       </Link>
                     ) : s.must_change_password ? (
                       <span className="rounded-full bg-fri-soft px-2.5 py-1 text-xs font-bold text-fri">Hasn't signed in yet</span>

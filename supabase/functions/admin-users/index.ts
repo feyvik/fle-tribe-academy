@@ -4,9 +4,12 @@
 // POST { action: 'create', fullName, email }  → creates a student with a temporary password
 // POST { action: 'reset', userId }            → sets a new temporary password
 // POST { action: 'delete', userId }           → removes the student and all their answers
-// Optional secret APP_URL (supabase secrets set APP_URL=https://…) is used in the sign-in message.
+// POST { action: 'send_certificate', userId, resend? } → emails the student's certificate, if they have one and it hasn't gone out
+// Secret APP_URL (your live https:// address) is used in the sign-in message.
+// Secrets RESEND_API_KEY and EMAIL_FROM turn on emailing the details; without them the admin copies the message instead.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { sendCertificateEmail, sendSignInEmail, SUPPORT_EMAIL } from './email.ts';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -37,9 +40,26 @@ function signInMessage(name: string, email: string, password: string, appUrl: st
     `Temporary password: ${password}`,
     '',
     "You'll be asked to choose your own password the first time you sign in.",
+    `Need help? Write to ${SUPPORT_EMAIL}.`,
     '',
     'FLE TRIBE',
   ].join('\n');
+}
+
+/** Builds the sign-in message and tries to email it. The admin always gets the message back in case the email fails. */
+async function deliverSignIn(name: string, email: string, password: string, appUrl: string, isReset: boolean) {
+  const message = signInMessage(name, email, password, appUrl, isReset);
+  const { sent, problem } = await sendSignInEmail({
+    apiKey: Deno.env.get('RESEND_API_KEY'),
+    from: Deno.env.get('EMAIL_FROM'),
+    to: email,
+    name,
+    password,
+    appUrl,
+    isReset,
+    text: message,
+  });
+  return { password, message, emailed: sent, emailProblem: problem };
 }
 
 Deno.serve(async (req) => {
@@ -76,7 +96,29 @@ Deno.serve(async (req) => {
       const taken = /already|registered|exists/i.test(error.message);
       return json({ error: taken ? 'There is already an account with that email.' : error.message }, taken ? 409 : 400);
     }
-    return json({ userId: data.user.id, password, message: signInMessage(fullName, email, password, appUrl, false) }, 201);
+    return json({ userId: data.user.id, ...(await deliverSignIn(fullName, email, password, appUrl, false)) }, 201);
+  }
+
+  if (body.action === 'send_certificate') {
+    const { data: cert, error } = await admin.from('certificates')
+      .select('number, full_name, issued_on, emailed_at').eq('user_id', body.userId).maybeSingle();
+    if (error) return json({ error: error.message }, 400);
+    if (!cert) return json({ issued: false });
+    if (cert.emailed_at && !body.resend) return json({ issued: true, number: cert.number, alreadySent: true, emailed: true });
+
+    const { data: student } = await admin.from('profiles').select('email').eq('id', body.userId).single();
+    if (!student) return json({ error: 'Student not found.' }, 404);
+    const { sent, problem } = await sendCertificateEmail({
+      apiKey: Deno.env.get('RESEND_API_KEY'),
+      from: Deno.env.get('EMAIL_FROM'),
+      to: student.email,
+      name: cert.full_name,
+      number: cert.number,
+      issuedOn: cert.issued_on,
+      appUrl,
+    });
+    if (sent) await admin.from('certificates').update({ emailed_at: new Date().toISOString() }).eq('number', cert.number);
+    return json({ issued: true, number: cert.number, emailed: sent, emailProblem: problem });
   }
 
   if (body.action === 'reset' || body.action === 'delete') {
@@ -92,7 +134,7 @@ Deno.serve(async (req) => {
     const { error } = await admin.auth.admin.updateUserById(student.id, { password });
     if (error) return json({ error: error.message }, 400);
     await admin.from('profiles').update({ must_change_password: true }).eq('id', student.id);
-    return json({ password, message: signInMessage(student.full_name, student.email, password, appUrl, true) });
+    return json(await deliverSignIn(student.full_name, student.email, password, appUrl, true));
   }
 
   return json({ error: 'Unknown action.' }, 400);

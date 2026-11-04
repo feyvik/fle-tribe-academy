@@ -94,4 +94,6 @@ export interface StudentSummary {
   created_at: string;
   completed: number;
   last_submitted_at: string | null;
+  /** Main-course days with feedback. The certificate is issued when this reaches every day. */
+  reviewed: number;
 }
