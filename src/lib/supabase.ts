@@ -21,6 +21,9 @@ export function errorText(err: unknown, fallback = 'Something went wrong. Try ag
   if (/PGRST116|0 rows|multiple \(or no\) rows/i.test(msg)) return 'This work has already been reviewed, so it can no longer be changed.';
   if (/PGRST202|schema cache|column .* does not exist/i.test(msg))
     return 'This feature needs the latest database update. An admin needs to run it in Supabase (see the README).';
+  // The page sent a certificate number, but Supabase is still running the old email function that only knew student IDs.
+  if (/invalid input syntax for type uuid/i.test(msg))
+    return 'The email function in Supabase is out of date. An admin needs to redeploy admin-users (see the README), then try again.';
   if (/row-level security/i.test(msg)) return 'You can’t do that yet. Finish the lessons before this one first.';
   return msg || fallback;
 }

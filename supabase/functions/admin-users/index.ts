@@ -4,7 +4,7 @@
 // POST { action: 'create', fullName, email }  → creates a student with a temporary password
 // POST { action: 'delete', userId }           → removes the student and all their answers
 // POST { action: 'password_changed' }         → any signed-in person: confirms their own password change by email
-// POST { action: 'send_certificate', userId, resend? } → emails the student's certificate, if they have one and it hasn't gone out
+// POST { action: 'send_certificate', number | userId, resend? } → emails the student's certificate, if they have one and it hasn't gone out
 // Secret APP_URL (your live https:// address) is used in the sign-in message.
 // Secrets RESEND_API_KEY and EMAIL_FROM turn on emailing the details; without them the admin copies the message instead.
 
@@ -20,11 +20,20 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
 
-/** Readable temporary password, e.g. "Kite-4827-Rain". */
+/**
+ * Readable temporary password, e.g. "Kite-4827-Rain-Ember": 3 words from 64 and 4 digits, about 2.4 billion possibilities
+ * (the old 2-word version had about 2.3 million). It only lasts until the first sign-in, when the student must replace it.
+ */
+const WORDS = [
+  'Kite', 'Rain', 'Lime', 'Wave', 'Star', 'Moon', 'Leaf', 'Bolt', 'Pine', 'Reef', 'Mint', 'Dune', 'Flame', 'Cloud', 'River', 'Stone',
+  'Ember', 'Frost', 'Maple', 'Cedar', 'Coral', 'Pearl', 'Amber', 'Delta', 'Comet', 'Orbit', 'Prism', 'Pixel', 'Rocket', 'Harbor', 'Meadow', 'Canyon',
+  'Falcon', 'Otter', 'Tiger', 'Panda', 'Raven', 'Heron', 'Lotus', 'Mango', 'Olive', 'Cocoa', 'Velvet', 'Marble', 'Silver', 'Copper', 'Indigo', 'Violet',
+  'Summit', 'Island', 'Forest', 'Desert', 'Glacier', 'Lagoon', 'Breeze', 'Thunder', 'Sunrise', 'Galaxy', 'Nectar', 'Quartz', 'Willow', 'Zephyr', 'Atlas', 'Beacon',
+];
 function tempPassword() {
-  const words = ['Kite', 'Rain', 'Lime', 'Wave', 'Star', 'Moon', 'Leaf', 'Bolt', 'Pine', 'Reef', 'Mint', 'Dune', 'Flame', 'Cloud', 'River', 'Stone'];
-  const r = crypto.getRandomValues(new Uint32Array(3));
-  return `${words[r[0] % words.length]}-${1000 + (r[1] % 9000)}-${words[r[2] % words.length]}`;
+  const r = crypto.getRandomValues(new Uint32Array(4));
+  const word = (n: number) => WORDS[n % WORDS.length];
+  return `${word(r[0])}-${1000 + (r[1] % 9000)}-${word(r[2])}-${word(r[3])}`;
 }
 
 function signInMessage(name: string, email: string, password: string, appUrl: string) {
@@ -110,21 +119,33 @@ Deno.serve(async (req) => {
   }
 
   if (body.action === 'send_certificate') {
-    const { data: cert, error } = await admin.from('certificates')
-      .select('number, full_name, issued_on, emailed_at').eq('user_id', body.userId).maybeSingle();
+    if (!body.number && !body.userId) return json({ error: 'Choose a certificate to send.' }, 400);
+    // By certificate number (any certificate, including other programs'), or by app student (after their last review).
+    const fields = 'number, full_name, issued_on, emailed_at, program, duration, user_id, record_id';
+    const { data: cert, error } = body.number
+      ? await admin.from('certificates').select(fields).eq('number', String(body.number)).maybeSingle()
+      : await admin.from('certificates').select(fields).eq('user_id', body.userId).maybeSingle();
     if (error) return json({ error: error.message }, 400);
     if (!cert) return json({ issued: false });
     if (cert.emailed_at && !body.resend) return json({ issued: true, number: cert.number, alreadySent: true, emailed: true });
 
-    const { data: student } = await admin.from('profiles').select('email').eq('id', body.userId).single();
-    if (!student) return json({ error: 'Student not found.' }, 404);
+    // App students' email is on their profile; other programs' is on their student record (from the sign-up form).
+    const { data: owner } = cert.user_id
+      ? await admin.from('profiles').select('email').eq('id', cert.user_id).maybeSingle()
+      : cert.record_id
+        ? await admin.from('student_records').select('email').eq('id', cert.record_id).maybeSingle()
+        : { data: null };
+    if (!owner?.email) {
+      return json({ issued: true, number: cert.number, emailed: false, emailProblem: 'There’s no email address on record for this student.' });
+    }
     const { sent, problem } = await sendCertificateEmail({
       apiKey: Deno.env.get('RESEND_API_KEY'),
       from: Deno.env.get('EMAIL_FROM'),
-      to: student.email,
+      to: owner.email,
       name: cert.full_name,
       number: cert.number,
       issuedOn: cert.issued_on,
+      program: cert.program,
       appUrl,
     });
     if (sent) await admin.from('certificates').update({ emailed_at: new Date().toISOString() }).eq('number', cert.number);

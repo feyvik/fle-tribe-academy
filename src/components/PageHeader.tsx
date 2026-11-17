@@ -40,6 +40,6 @@ export function PageHeader({
 }
 
 /** Lime call-to-action button style for use on purple. */
-export const limeButton = 'inline-flex items-center rounded-lg bg-lime px-5 py-2.5 font-bold text-ink hover:brightness-95';
+export const limeButton = 'inline-flex items-center rounded-md bg-lime px-5 py-2.5 font-bold text-ink hover:brightness-95';
 /** Outline button style for use on purple. */
-export const ghostButton = 'inline-flex items-center rounded-lg border border-white/40 px-5 py-2.5 font-semibold text-white hover:bg-white/10';
+export const ghostButton = 'inline-flex items-center rounded-md border border-white/40 px-5 py-2.5 font-semibold text-white hover:bg-white/10';

@@ -13,10 +13,12 @@ export const CERTIFICATE_SETTINGS = {
   signer: {
     name: "Favour Vivian Woka",
     title: "Founder FLE TRIBE LTD",
-    signature: "/brand/signature.png",
+    signature: "/brand/signature.jpg",
   },
   /** Optional partner logo shown top right, e.g. { src: '/brand/partner.png', name: 'Partner' }. */
   partnerLogo: null as { src: string; name: string } | null,
+  /** Logos for partners named on individual certificates (certificates.partner). */
+  partnerLogos: { 'Startup Graveyard': '/brand/startup-graveyard.png' } as Record<string, string>,
 };
 
 /** Shown at /verify/sample with a "SAMPLE" watermark, to preview the design. */

@@ -23,12 +23,17 @@ function useCertificateFonts() {
 
 export function CertificateCard({ certificate, sample = false }: { certificate: Certificate; sample?: boolean }) {
   useCertificateFonts();
+  // Certificates from other programs carry their own program, length and partner.
+  const program = certificate.program || settings.program;
+  const duration = certificate.duration || settings.duration;
+  const partnerSrc = certificate.partner ? settings.partnerLogos[certificate.partner] : undefined;
+  const partner = partnerSrc && certificate.partner ? { src: partnerSrc, name: certificate.partner } : settings.partnerLogo;
   return (
     <div className="cert-frame">
       <article className="cert" aria-label={`Certificate of completion for ${certificate.full_name}`}>
         <header className="cert-top">
           <img src="/brand/logo.png" alt="FLE TRIBE" width={1200} height={432} decoding="async" className="cert-logo" />
-          {settings.partnerLogo && <img className="cert-partner" src={settings.partnerLogo.src} alt={settings.partnerLogo.name} />}
+          {partner && <img className="cert-partner" src={partner.src} alt={partner.name} />}
         </header>
 
         <section className="cert-band">
@@ -42,9 +47,9 @@ export function CertificateCard({ certificate, sample = false }: { certificate: 
         <section className="cert-body">
           <p className="cert-name">{certificate.full_name}</p>
           <p className="cert-text">
-            This certificate is proudly presented to <b>{certificate.full_name}</b> for successfully completing the {settings.duration}
+            This certificate is proudly presented to <b>{certificate.full_name}</b> for successfully completing the {duration}
             <br />
-            <b>{settings.program}</b> program with <b>The FLE Tribe</b>
+            <b>{program}</b> with <b>The FLE Tribe</b>
           </p>
         </section>
 

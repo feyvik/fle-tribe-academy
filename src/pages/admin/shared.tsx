@@ -39,14 +39,14 @@ export function CredentialsCard({ details, heading, onClose }: { details: SignIn
   }
   const message = (
     <>
-      <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-lg bg-surface p-4 font-mono text-sm">{details.message}</pre>
-      <button type="button" onClick={copy} className="mt-3 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+      <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md bg-surface p-4 font-mono text-sm">{details.message}</pre>
+      <button type="button" onClick={copy} className="mt-3 fle-btn fle-btn-primary fle-btn-sm">
         {copied ? 'Copied ✓' : 'Copy message'}
       </button>
     </>
   );
   return (
-    <section className="rounded-xl border-2 border-brand bg-accent-soft p-5" role="status">
+    <section className="rounded-lg border-2 border-brand bg-accent-soft p-5" role="status">
       <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-bold">{heading}</h3>
@@ -111,7 +111,7 @@ export function SubmissionReview({
   }
 
   return (
-    <article className="rounded-xl border border-line bg-surface p-5">
+    <article className="rounded-lg border border-line bg-surface p-5">
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="eyebrow">{info.label}</div>
@@ -121,7 +121,7 @@ export function SubmissionReview({
         <div className="text-right text-xs text-muted">
           Submitted {formatDateTime(submission.submitted_at)}
           <div className="mt-1">
-            <span className={`rounded-full px-2.5 py-1 font-bold ${submission.reviewed_at ? 'bg-sat-soft text-sat' : 'bg-fri-soft text-fri'}`}>
+            <span className={`fle-tag ${submission.reviewed_at ? 'fle-tag-lime' : 'fle-tag-coral'}`}>
               {submission.reviewed_at ? 'Reviewed' : 'Needs review'}
             </span>
           </div>
@@ -150,7 +150,7 @@ export function SubmissionReview({
       </dl>
 
       {submission.feedback ? (
-        <div className="mt-4 rounded-lg bg-sat-soft p-4">
+        <div className="mt-4 rounded-md bg-sat-soft p-4">
           <div className="eyebrow mb-1 !text-sat">Your feedback</div>
           <p className="m-0 whitespace-pre-wrap">{submission.feedback}</p>
         </div>
@@ -158,10 +158,10 @@ export function SubmissionReview({
         <form className="mt-4 grid gap-2" onSubmit={save}>
           <label htmlFor={`fb-${submission.id}`} className="text-sm font-semibold">Feedback for the student</label>
           <textarea id={`fb-${submission.id}`} rows={3} placeholder="What's good, and one thing to improve." value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)} className="rounded-lg border border-line bg-bg px-3 py-2.5" />
+                    onChange={(e) => setFeedback(e.target.value)} className="fle-input fle-input-multi" />
           {error && <p className="text-sm font-semibold text-fri" role="alert">{error}</p>}
           <div className="flex flex-wrap items-center gap-3">
-            <button type="submit" disabled={busy} className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60">
+            <button type="submit" disabled={busy} className="fle-btn fle-btn-primary fle-btn-sm">
               {busy ? 'Saving…' : 'Send feedback'}
             </button>
             <span className="text-xs text-muted">The student sees it on the lesson. Their answers can't be edited afterwards.</span>
@@ -170,7 +170,7 @@ export function SubmissionReview({
       )}
 
       {certificate && (
-        <p className="mt-4 rounded-lg bg-accent-soft p-4 text-sm font-semibold" role="status">
+        <p className="mt-4 rounded-md bg-accent-soft p-4 text-sm font-semibold" role="status">
           🎓 That completes the course. Certificate <span className="font-mono">{certificate.number}</span> has been issued
           {certificate.emailed
             ? ' and emailed to the student.'

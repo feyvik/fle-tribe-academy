@@ -1,0 +1,104 @@
+/* FLE Tribe component styles. Load after fle-tokens.css. Every value comes from the tokens. */
+body { margin: 0; font-family: var(--font-body); font-size: 16px; line-height: 24px; background: var(--surface); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.fle-icon { flex: none; display: inline-block; vertical-align: middle; }
+.fle-overline { font-family: var(--font-body); font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+
+/* Button */
+.fle-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); font-family: var(--font-body); font-weight: 600; border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer; text-decoration: none; transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+.fle-btn-sm { height: 32px; padding: 0 var(--space-3); font-size: 14px; }
+.fle-btn-md { height: 40px; padding: 0 var(--space-4); font-size: 15px; }
+.fle-btn-lg { height: 48px; padding: 0 var(--space-5); font-size: 16px; }
+.fle-btn-full { width: 100%; }
+.fle-btn-primary { background: var(--primary); color: var(--on-primary); }
+.fle-btn-primary:hover { background: var(--primary-hover); }
+.fle-btn-secondary { background: var(--surface-raised); color: var(--ink); border-color: var(--line-strong); }
+.fle-btn-secondary:hover { background: var(--surface-sunken); }
+.fle-btn-ghost { background: transparent; color: var(--primary); }
+.fle-btn-ghost:hover { background: var(--primary-soft); }
+.fle-btn-win { background: var(--lime); color: var(--on-lime); }
+.fle-btn:focus-visible, .fle-input:focus-visible, .fle-code-pre:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.fle-btn:disabled { cursor: not-allowed; background: var(--surface-sunken); color: var(--ink-muted); border-color: var(--line); }
+@media (prefers-reduced-motion: reduce) { .fle-btn, .fle-progress-fill { transition: none; } }
+
+/* Tag */
+.fle-tag { display: inline-flex; align-items: center; gap: var(--space-1); height: 24px; padding: 0 var(--space-2); border-radius: var(--radius-sm); font-size: 13px; line-height: 16px; font-weight: 600; white-space: nowrap; }
+.fle-tag-neutral { background: var(--surface-sunken); color: var(--ink-muted); }
+.fle-tag-primary { background: var(--primary-soft); color: var(--primary); }
+.fle-tag-lime { background: var(--lime-soft); color: var(--lime-ink); }
+.fle-tag-coral { background: var(--coral-soft); color: var(--coral-ink); }
+.fle-tag-danger { background: var(--danger-soft); color: var(--danger); }
+.fle-tag-warning { background: var(--warning-soft); color: var(--warning); }
+
+/* ProgressBar */
+.fle-progress { display: flex; flex-direction: column; gap: var(--space-1); width: 100%; }
+.fle-progress-head { display: flex; justify-content: space-between; gap: var(--space-2); font-size: 13px; line-height: 16px; color: var(--ink-muted); }
+.fle-progress-value { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.fle-progress-track { height: 8px; border-radius: var(--radius-full); background: var(--surface-sunken); overflow: hidden; }
+.fle-progress-fill { height: 100%; border-radius: var(--radius-full); transition: width .4s ease; }
+.fle-progress-primary { background: var(--primary); }
+.fle-progress-lime { background: var(--lime); }
+.fle-progress-coral { background: var(--coral); }
+
+/* LessonCard */
+.fle-lesson { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); min-width: 0; }
+.fle-lesson-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); flex-wrap: wrap; }
+.fle-lesson-title { margin: 0; font-family: var(--font-heading); font-size: 20px; line-height: 26px; font-weight: 700; color: var(--ink); text-wrap: balance; }
+.fle-lesson-desc { margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.fle-lesson-meta { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+.fle-meta { display: inline-flex; align-items: center; gap: var(--space-1); font-size: 13px; line-height: 16px; color: var(--ink-muted); }
+.fle-lesson .fle-btn { align-self: flex-start; }
+.fle-lesson-in-progress { border-color: var(--primary); }
+.fle-lesson-locked .fle-lesson-title { color: var(--ink-muted); }
+.fle-lesson-locked { background: var(--surface); box-shadow: none; }
+.fle-lesson-note { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+
+/* StageTracker */
+.fle-stages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-3); counter-reset: none; }
+.fle-stage { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius-lg); min-width: 0; }
+.fle-stage-node { flex: none; width: 32px; height: 32px; border-radius: var(--radius-full); display: grid; place-items: center; font-family: var(--font-heading); font-weight: 700; font-size: 14px; }
+.fle-stage-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fle-stage-name { font-weight: 600; font-size: 15px; line-height: 20px; color: var(--ink); }
+.fle-stage-state { font-size: 13px; line-height: 16px; color: var(--ink-muted); }
+.fle-stage-done .fle-stage-node { background: var(--lime); color: var(--on-lime); }
+.fle-stage-current { background: var(--primary-soft); }
+.fle-stage-current .fle-stage-node { background: var(--primary); color: var(--on-primary); }
+.fle-stage-current .fle-stage-state { color: var(--primary); font-weight: 600; }
+.fle-stage-upcoming .fle-stage-node { background: var(--surface-raised); color: var(--ink-muted); border: 1px solid var(--line-strong); }
+
+/* ReviewComment */
+.fle-review { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-4); background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.fle-review-head { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.fle-review-loc { font-family: var(--font-mono); font-size: 13px; padding: 2px var(--space-1); border-radius: var(--radius-sm); background: var(--surface-sunken); color: var(--ink); }
+.fle-review-who { margin-left: auto; font-size: 13px; color: var(--ink-muted); }
+.fle-review-body { font-size: 15px; line-height: 22px; color: var(--ink); }
+.fle-review-body p { margin: 0; }
+.fle-review-must-fix { border-color: var(--danger); }
+
+/* Callout */
+.fle-callout { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4); border-radius: var(--radius-lg); color: var(--ink); }
+.fle-callout-label { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: 700; font-size: 14px; line-height: 20px; }
+.fle-callout-body { font-size: 15px; line-height: 22px; }
+.fle-callout-tip { background: var(--primary-soft); }
+.fle-callout-tip .fle-callout-label { color: var(--primary); }
+.fle-callout-heads-up { background: var(--warning-soft); }
+.fle-callout-heads-up .fle-callout-label { color: var(--warning); }
+.fle-callout-win { background: var(--lime-soft); }
+.fle-callout-win .fle-callout-label { color: var(--lime-ink); }
+.fle-callout-streak { background: var(--coral-soft); }
+.fle-callout-streak .fle-callout-label { color: var(--coral-ink); }
+
+/* CodeSnippet */
+.fle-code { margin: 0; border-radius: var(--radius-md); background: var(--surface-sunken); border: 1px solid var(--line); overflow: hidden; min-width: 0; }
+.fle-code-head { display: flex; justify-content: space-between; gap: var(--space-2); padding: var(--space-2) var(--space-4); border-bottom: 1px solid var(--line); font-size: 13px; line-height: 16px; color: var(--ink-muted); font-family: var(--font-mono); }
+.fle-code-lang { text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font-body); font-weight: 700; font-size: 11px; }
+.fle-code-pre { margin: 0; padding: var(--space-4); overflow-x: auto; font-family: var(--font-mono); font-size: 14px; line-height: 22px; color: var(--ink); }
+
+/* TextField */
+.fle-field { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.fle-field-label { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--ink); }
+.fle-input { font: inherit; font-size: 15px; height: 40px; padding: 0 var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink); }
+.fle-input::placeholder { color: var(--ink-muted); }
+.fle-input-multi { height: auto; min-height: 96px; padding: var(--space-2) var(--space-3); resize: vertical; }
+.fle-field-error .fle-input { border-color: var(--danger); border-width: 2px; }
+.fle-field-msg { margin: 0; display: inline-flex; align-items: center; gap: var(--space-1); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.fle-field-msg-error { color: var(--danger); font-weight: 600; }

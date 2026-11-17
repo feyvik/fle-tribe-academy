@@ -26,7 +26,7 @@ export function MediaPlayer({ media }: { media?: LessonMedia }) {
 
   if (!media) {
     return (
-      <div className="grid aspect-video max-h-72 w-full place-items-center rounded-xl border border-dashed border-line bg-sunk text-center">
+      <div className="grid aspect-video max-h-72 w-full place-items-center rounded-lg border border-dashed border-line bg-sunk text-center">
         <div>
           <div className="eyebrow">Lesson media</div>
           <p className="mt-1 text-muted">Video coming soon</p>
@@ -43,7 +43,7 @@ export function MediaPlayer({ media }: { media?: LessonMedia }) {
         {id ? (
           <YouTubeVideo id={id} title={media.title || 'Lesson video'} />
         ) : (
-          <p className="rounded-xl border border-fri bg-fri-soft p-4 text-sm">
+          <p className="rounded-lg border border-fri bg-fri-soft p-4 text-sm">
             This lesson's YouTube link can't be played. An admin needs to update it under Admin → Lesson media.
           </p>
         )}
@@ -52,15 +52,15 @@ export function MediaPlayer({ media }: { media?: LessonMedia }) {
   }
 
   if (failed) {
-    return <p className="rounded-xl bg-fri-soft p-4 text-sm font-semibold text-fri">This file couldn't be loaded. Refresh the page to try again.</p>;
+    return <p className="rounded-lg bg-fri-soft p-4 text-sm font-semibold text-fri">This file couldn't be loaded. Refresh the page to try again.</p>;
   }
-  if (!fileUrl) return <div className="aspect-video w-full animate-pulse rounded-xl bg-sunk" aria-label="Loading" />;
+  if (!fileUrl) return <div className="aspect-video w-full animate-pulse rounded-lg bg-sunk" aria-label="Loading" />;
 
   if (media.kind === 'video') {
     return (
       <figure className="m-0">
         {media.title && <figcaption className="mb-2 font-semibold">{media.title}</figcaption>}
-        <video className="aspect-video w-full rounded-xl bg-black" src={fileUrl} controls preload="metadata" playsInline />
+        <video className="aspect-video w-full rounded-lg bg-black" src={fileUrl} controls preload="metadata" playsInline />
       </figure>
     );
   }
@@ -70,13 +70,13 @@ export function MediaPlayer({ media }: { media?: LessonMedia }) {
       <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
         <figcaption className="font-semibold">{media.title || 'Lesson PDF'}</figcaption>
         <div className="flex gap-2 text-sm font-semibold">
-          <a href={fileUrl} target="_blank" rel="noopener" className="rounded-lg border border-line bg-surface px-3 py-1.5 hover:border-fg">
+          <a href={fileUrl} target="_blank" rel="noopener" className="fle-btn fle-btn-secondary fle-btn-sm">
             Open in new tab ↗
           </a>
-          <a href={`${fileUrl}&download=`} className="rounded-lg bg-fg px-3 py-1.5 text-bg hover:opacity-90">Download</a>
+          <a href={`${fileUrl}&download=`} className="fle-btn fle-btn-primary fle-btn-sm">Download</a>
         </div>
       </div>
-      <iframe loading="lazy" className="h-[75vh] min-h-[420px] w-full rounded-xl border border-line bg-surface" src={`${fileUrl}#view=FitH`} title={media.title || 'Lesson PDF'} />
+      <iframe loading="lazy" className="h-[75vh] min-h-[420px] w-full rounded-lg border border-line bg-surface" src={`${fileUrl}#view=FitH`} title={media.title || 'Lesson PDF'} />
       <p className="mt-2 text-sm text-muted">If the PDF doesn't show on your phone, use "Open in new tab".</p>
     </figure>
   );
@@ -89,7 +89,7 @@ export function MediaPlayer({ media }: { media?: LessonMedia }) {
 function YouTubeVideo({ id, title }: { id: string; title: string }) {
   const [playing, setPlaying] = useState(false);
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
+    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
       {playing ? (
         <iframe
           className="h-full w-full"

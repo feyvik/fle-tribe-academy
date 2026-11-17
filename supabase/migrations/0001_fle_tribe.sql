@@ -178,7 +178,9 @@ begin
 end $$;
 
 -- Public verification: anyone with the number can confirm a certificate.
-create or replace function public.verify_certificate(p_number text)
+-- (Dropped first: 0004 adds columns to it, and Postgres can't change a function's columns in place.)
+drop function if exists public.verify_certificate(text);
+create function public.verify_certificate(p_number text)
 returns table (number text, full_name text, issued_on date)
 language sql stable security definer set search_path = public as $$
   select c.number, c.full_name, c.issued_on from public.certificates c where upper(c.number) = upper(trim(p_number));

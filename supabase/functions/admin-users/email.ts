@@ -181,9 +181,12 @@ export interface CertificateEmail {
   number: string;
   /** ISO date, e.g. 2026-11-30. */
   issuedOn: string;
+  /** e.g. 'Data Analysis Program'. Empty means the learning app's Frontend Developer Program. */
+  program?: string | null;
   appUrl: string;
 }
 
+const programName = (e: CertificateEmail) => e.program || 'Frontend Developer Program';
 const certificateUrl = (e: CertificateEmail) => `${e.appUrl}/verify/${encodeURIComponent(e.number)}`;
 const longDate = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -192,7 +195,7 @@ export function certificateText(e: CertificateEmail) {
   return [
     `Congratulations ${e.name}!`,
     '',
-    'You have completed the FLE TRIBE Frontend Developer Program, and your certificate is ready.',
+    `You have completed the FLE TRIBE ${programName(e)}, and your certificate is ready.`,
     '',
     `Certificate No: ${e.number}`,
     `Issued: ${longDate(e.issuedOn)}`,
@@ -215,7 +218,7 @@ export function certificateHtml(e: CertificateEmail) {
     reason: 'FLE TRIBE issued a certificate to',
     body: `
           <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Hi ${escape(e.name)},</p>
-          <p style="margin:0 0 24px;font-size:15px;line-height:1.6">You've completed the FLE TRIBE <b>Frontend Developer Program</b>. Five months of work, reviewed and done. We're proud of what you've built.</p>
+          <p style="margin:0 0 24px;font-size:15px;line-height:1.6">You've completed the FLE TRIBE <b>${escape(programName(e))}</b>. We're proud of everything you've learned and built.</p>
 
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f6fb;border-radius:12px;border:1px solid ${LINE}">
             <tr><td style="padding:18px 20px 8px">${detail('Awarded to', e.name)}</td></tr>

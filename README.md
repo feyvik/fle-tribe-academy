@@ -13,9 +13,8 @@ Built with **React + Vite + Tailwind CSS v4**, with **Supabase** for sign-in, th
 1. Create a project at [supabase.com](https://supabase.com).
 2. **Turn off public sign-up:** Authentication → Sign In / Providers → Email → switch off **Allow new users to sign up**.
    Accounts are created only by admins.
-3. **Create the database:** SQL Editor → paste all of `supabase/migrations/0001_fle_tribe.sql` → Run. Then do the same with
-   `0002_profile_and_completion.sql` (course structure, profiles, links, certificate rules), then `0003_auto_certificates.sql`
-   (automatic certificates once every day is reviewed). All are safe to run again.
+3. **Create the database:** run every file in `supabase/migrations/` in order, `0001` to `0005`, with `npm run db:push`
+   (see "Database updates" below) or by pasting each into SQL Editor → Run. All are safe to run again.
 4. **Deploy the admin function** (it creates student accounts, so it needs the service key, which never goes in the browser):
    ```bash
    npx supabase login
@@ -30,6 +29,24 @@ Built with **React + Vite + Tailwind CSS v4**, with **Supabase** for sign-in, th
    ```
 6. Copy `.env.example` to `.env` and fill in the Project URL and the **anon** key (Project Settings → API).
 
+## Database updates
+
+Changes to the database live in `supabase/migrations/`, numbered in the order they run. Applying them with the
+Supabase command line is more reliable than copying them into the SQL Editor:
+
+```bash
+npx supabase login                                  # once
+npx supabase link --project-ref <your-project-ref>  # once; asks for the database password
+npm run db:push                                     # applies any migrations the live database hasn't had yet
+```
+
+If you've been running migrations by hand in the SQL Editor, first tell Supabase which ones it already has, so it
+doesn't run them again (once only):
+
+```bash
+npx supabase migration repair --status applied 0001 0002 0003 0004
+```
+
 ## Run it
 
 Needs Node 20 or newer.
@@ -38,6 +55,8 @@ Needs Node 20 or newer.
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # production files in dist/
+npm test         # app and database tests (uses a throwaway in-memory database, never the live one)
+npm run preview  # the production build with the live site's security headers (vercel.json)
 ```
 
 ## How it works

@@ -1,10 +1,14 @@
 /**
- * The official FLE TRIBE logo files (from The FLE Tribe/PNG), served from public/brand/.
- * variant 'full' = mark + "FLE TRIBE" wordmark, 'icon' = mark only.
- * tone 'color' = purple mark + grey wordmark, 'white' = all white for purple or dark backgrounds.
- * Width and height are set so the page doesn't jump while the image loads; CSS sets the displayed size.
+ * The FLE TRIBE logos from the brand kit (fle-tribe-brand-kit/assets/logos), served from public/brand/ as SVG.
+ * variant 'full' = mark with the stacked "FLE TRIBE" wordmark (the kit's primary logo), 'icon' = mark only.
+ * tone 'color' = brand-blue mark + raisin wordmark, 'white' = all white, for brand-blue or dark backgrounds.
+ * Width and height match each SVG's shape so the page doesn't jump while it loads; CSS sets the displayed size.
+ * (Emails and the printed certificate keep the PNG versions, because many email apps can't show SVG.)
  */
-const SIZES = { full: { width: 1200, height: 432 }, icon: { width: 512, height: 508 } };
+const FILES = {
+  full: { color: '/brand/fle-tribe-logo-primary.svg', white: '/brand/fle-tribe-logo-primary-white.svg', width: 260, height: 95 },
+  icon: { color: '/brand/fle-tribe-mark.svg', white: '/brand/fle-tribe-mark-white.svg', width: 96, height: 95 },
+};
 
 export function Logo({
   variant = 'full',
@@ -18,16 +22,14 @@ export function Logo({
   /** Background watermark: hidden from screen readers and loaded lazily. */
   decorative?: boolean;
 }) {
-  const src =
-    variant === 'icon'
-      ? tone === 'white' ? '/brand/icon-white.png' : '/brand/icon.png'
-      : tone === 'white' ? '/brand/logo-white.png' : '/brand/logo.png';
+  const file = FILES[variant];
   return (
     <img
-      src={src}
+      src={file[tone]}
       alt={decorative ? '' : 'FLE TRIBE'}
       aria-hidden={decorative || undefined}
-      {...SIZES[variant]}
+      width={file.width}
+      height={file.height}
       loading={decorative ? 'lazy' : undefined}
       decoding="async"
       className={`block w-auto ${className}`}
@@ -35,12 +37,13 @@ export function Logo({
   );
 }
 
-/** Full logo that switches to the white version in dark mode. */
+/** Full logo that switches to the white version in dark mode, as the brand kit asks. */
 export function ThemedLogo({ className = '' }: { className?: string }) {
+  const file = FILES.full;
   return (
     <picture className="block">
-      <source srcSet="/brand/logo-white.png" media="(prefers-color-scheme: dark)" />
-      <img src="/brand/logo.png" alt="FLE TRIBE" {...SIZES.full} decoding="async" className={`block w-auto ${className}`} />
+      <source srcSet={file.white} media="(prefers-color-scheme: dark)" />
+      <img src={file.color} alt="FLE TRIBE" width={file.width} height={file.height} decoding="async" className={`block w-auto ${className}`} />
     </picture>
   );
 }
