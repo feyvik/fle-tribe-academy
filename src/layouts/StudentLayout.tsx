@@ -30,9 +30,10 @@ function Shell() {
   useEffect(() => setMenuOpen(false), [location.pathname]);
 
   if (progress.loading) return <FullPageMessage text="Loading your course…" />;
+  if (progress.error) return <FullPageMessage text={`${progress.error} Check your connection, then try again.`} action={{ label: 'Try again', onClick: progress.retry }} />;
 
   const navItem = ({ isActive }: { isActive: boolean }) =>
-    `grid grid-cols-[38px_1fr_auto] items-center gap-1.5 rounded-lg px-2.5 py-2 text-[15px] leading-tight transition-colors ${
+    `grid grid-cols-[38px_1fr_auto] items-center gap-1.5 rounded-md px-2.5 py-2 text-[15px] leading-tight transition-colors ${
       isActive ? 'bg-side-active font-semibold text-side-active-fg' : 'text-side-fg hover:bg-side-hover'
     }`;
 
@@ -42,7 +43,7 @@ function Shell() {
       <header className="no-print sticky top-0 z-30 flex items-center justify-between gap-3 bg-brand px-4 py-3 text-white lg:hidden">
         <Link to="/" aria-label="FLE TRIBE home"><Logo tone="white" className="h-8" /></Link>
         <button type="button" aria-expanded={menuOpen} aria-controls="course-nav" onClick={() => setMenuOpen((o) => !o)}
-                className="rounded-lg bg-lime px-3 py-1.5 text-sm font-bold text-ink">
+                className="rounded-md bg-lime px-3 py-1.5 text-sm font-bold text-ink">
           {menuOpen ? 'Close' : 'Menu'}
         </button>
       </header>
@@ -54,7 +55,7 @@ function Shell() {
         <Link to="/" className="mb-1 hidden lg:block" aria-label="FLE TRIBE home"><ThemedLogo className="h-12" /></Link>
         <p className="mb-6 hidden font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-side-label lg:block">Frontend Developer Program</p>
 
-        <div className="mb-4 flex items-center justify-between gap-2 rounded-xl bg-side-card px-4 py-3 shadow-sm">
+        <div className="mb-4 flex items-center justify-between gap-2 rounded-lg bg-side-card px-4 py-3 shadow-sm">
           <Link to="/profile" className="group min-w-0" title="Edit your profile">
             <div className="truncate font-semibold group-hover:text-accent">{profile?.full_name}</div>
             <div className="truncate text-xs text-side-muted">{profile?.email}</div>
@@ -68,12 +69,12 @@ function Shell() {
         </div>
 
         {isAdmin ? (
-          <Link to="/admin" className="mb-6 block rounded-xl bg-brand px-4 py-3 text-sm font-bold text-white hover:opacity-90">
+          <Link to="/admin" className="mb-6 block rounded-lg bg-primary px-4 py-3 text-sm font-bold text-on-primary hover:bg-accent-hover">
             ← Back to admin
             <span className="block text-xs font-medium text-white/80">You're previewing the course. Every lesson is open.</span>
           </Link>
         ) : (
-          <div className="mb-6 rounded-xl bg-side-card p-4 shadow-sm">
+          <div className="mb-6 rounded-lg bg-side-card p-4 shadow-sm">
             <div className="flex items-baseline justify-between">
               <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-side-label">Your progress</span>
               <span className="font-display text-lg font-extrabold tabular-nums">{progress.percent}%</span>

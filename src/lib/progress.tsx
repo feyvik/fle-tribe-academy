@@ -2,10 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { DayKey, LessonMedia, Submission } from '../data/models';
 import { useAuth } from './auth';
 import { DAY_KEYS, isBonus, lessonKey, mainDays } from './course';
-import { supabase } from './supabase';
+import { errorText, supabase } from './supabase';
 
 interface ProgressState {
   loading: boolean;
+  /** Set when the student's progress couldn't be loaded (e.g. no connection). Lessons are not shown as locked then. */
+  error: string;
+  retry: () => void;
   /** Days of the main course submitted, out of totalCount. Bonus courses don't count. */
   completedCount: number;
   totalCount: number;
@@ -34,15 +37,25 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [subs, setSubs] = useState<Record<string, Submission>>({});
   const [mediaRows, setMediaRows] = useState<Record<string, LessonMedia>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!profile) return;
     let cancelled = false;
+    setLoading(true);
+    setError('');
     Promise.all([
       supabase.from('submissions').select('*').eq('user_id', profile.id),
       supabase.from('lesson_media').select('*'), // row level security only returns unlocked lessons
     ]).then(([s, m]) => {
       if (cancelled) return;
+      // Without this, a failed request looked like "nothing submitted yet" and every lesson after the first was locked.
+      if (s.error || m.error) {
+        setError(errorText(s.error ?? m.error, 'Your progress couldn’t be loaded.'));
+        setLoading(false);
+        return;
+      }
       setSubs(Object.fromEntries(((s.data ?? []) as Submission[]).map((x) => [x.lesson_key, x])));
       setMediaRows(Object.fromEntries(((m.data ?? []) as LessonMedia[]).map((x) => [x.lesson_key, x])));
       setLoading(false);
@@ -50,7 +63,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [profile]);
+  }, [profile, attempt]);
 
   // Media becomes visible as lessons unlock, so reload it whenever progress grows.
   const completedCount = Object.keys(subs).length;
@@ -105,6 +118,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   const value: ProgressState = {
     loading,
+    error,
+    retry: () => setAttempt((n) => n + 1),
     completedCount: mainDone,
     totalCount: mainDays.length,
     percent: Math.round((mainDone / mainDays.length) * 100),
@@ -122,6 +137,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
 }
 
+// The hook lives next to its provider on purpose; this only affects hot reload during development.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useProgress() {
   const ctx = useContext(ProgressContext);
   if (!ctx) throw new Error('useProgress must be used inside ProgressProvider');

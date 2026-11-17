@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CertificateCard } from '../components/CertificateCard';
 import { ThemedLogo } from '../components/Logo';
 import { SAMPLE_CERTIFICATE } from '../data/certificates';
 import type { Certificate } from '../data/models';
+import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 
 /** Public page at /verify/:number. Shows a certificate so anyone can confirm it, and lets the owner save it as PDF. */
 export default function Verify() {
   const { number = '' } = useParams();
   const isSample = number.toLowerCase() === 'sample';
+  const { profile, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  /** Signed-in people came here from the app: go back to where they were, or to their certificates page. */
+  const goBack = () => (location.key !== 'default' ? navigate(-1) : navigate(isAdmin ? '/admin/certificates' : '/certificates'));
   const [certificate, setCertificate] = useState<Certificate | null>(null);
   const [state, setState] = useState<'loading' | 'found' | 'missing' | 'error'>('loading');
 
@@ -35,7 +41,12 @@ export default function Verify() {
     <div className="mx-auto max-w-[1100px] px-4 py-8 print:max-w-none print:p-0">
       <header className="no-print mb-8 flex items-center justify-between gap-4">
         <Link to="/" aria-label="FLE TRIBE home"><ThemedLogo className="h-10" /></Link>
-        <span className="font-display text-sm font-semibold text-muted">Certificate verification</span>
+        <div className="flex items-center gap-4">
+          <span className="hidden font-display text-sm font-semibold text-muted sm:inline">Certificate verification</span>
+          {profile && (
+            <button type="button" onClick={goBack} className="fle-btn fle-btn-secondary fle-btn-sm">← Back</button>
+          )}
+        </div>
       </header>
 
       {state === 'loading' && <p className="text-muted">Checking certificate…</p>}
@@ -60,11 +71,17 @@ export default function Verify() {
                 Verified: FLE TRIBE issued this certificate to {certificate.full_name}.
               </p>
             )}
-            <button type="button" onClick={() => window.print()} className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white hover:opacity-90">
+            <button type="button" onClick={() => window.print()} className="fle-btn fle-btn-primary fle-btn-md">
               Download PDF
             </button>
           </div>
-          <CertificateCard certificate={certificate} sample={isSample} />
+          {/* On phones the certificate keeps a readable size and scrolls sideways, instead of shrinking its text to ~5px. */}
+          <p className="no-print mb-2 text-sm text-muted sm:hidden">Swipe sideways to see the whole certificate.</p>
+          <div className="max-sm:-mx-4 max-sm:overflow-x-auto max-sm:px-4 max-sm:pb-2">
+            <div className="max-sm:w-[680px]">
+              <CertificateCard certificate={certificate} sample={isSample} />
+            </div>
+          </div>
           <p className="no-print mt-4 text-sm text-muted">
             "Download PDF" opens the print dialog: choose <b>Save as PDF</b>, landscape, and turn on <b>Background graphics</b>. To share
             it, copy this page's address.

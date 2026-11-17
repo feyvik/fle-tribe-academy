@@ -81,7 +81,7 @@ export function certificateDate(iso: string): string {
 }
 
 export function formatDateTime(iso: string | null) {
-  if (!iso) return '—';
+  if (!iso) return 'N/A';
   return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 

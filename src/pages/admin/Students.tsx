@@ -5,7 +5,8 @@ import { mainDays, formatDateTime } from '../../lib/course';
 import { adminUsers, errorText, supabase } from '../../lib/supabase';
 import { CredentialsCard, type SignInDetails } from './shared';
 import { PageHeader } from '../../components/PageHeader';
-import { Pagination, usePagination } from '../../components/Pagination';
+import { Pagination } from '../../components/Pagination';
+import { usePagination } from '../../lib/pagination';
 import { OtherPrograms } from './OtherPrograms';
 
 /** Add students (there is no public sign-up) and see everyone's progress. */
@@ -66,14 +67,14 @@ export default function Students() {
     }
   }
 
-  const field = 'rounded-lg border border-line bg-bg px-3 py-2.5';
+  const field = 'fle-input';
   return (
     <>
       <PageHeader eyebrow="Admin" title="Students">
         There's no public sign-up. Add each student here and send them their sign-in details.
       </PageHeader>
 
-      <section className="mb-8 rounded-xl border border-line bg-surface p-5">
+      <section className="mb-8 rounded-lg border border-line bg-surface p-5">
         <h2 className="mb-4 text-lg font-bold">Add a student</h2>
         <form className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end" onSubmit={add} noValidate>
           <div className="grid gap-1.5">
@@ -84,11 +85,11 @@ export default function Students() {
             <label htmlFor="new-email" className="text-sm font-semibold">Email</label>
             <input id="new-email" type="email" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
           </div>
-          <button type="submit" disabled={busy} className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white hover:opacity-90 disabled:opacity-60">
+          <button type="submit" disabled={busy} className="fle-btn fle-btn-primary fle-btn-md">
             {busy ? 'Adding…' : 'Add student'}
           </button>
         </form>
-        {error && <p className="mt-3 rounded-lg bg-fri-soft px-3 py-2 text-sm font-semibold text-fri" role="alert">{error}</p>}
+        {error && <p className="mt-3 rounded-md bg-fri-soft px-3 py-2 text-sm font-semibold text-fri" role="alert">{error}</p>}
       </section>
 
       {created && (
@@ -99,9 +100,9 @@ export default function Students() {
 
       <h2 className="mb-3 text-lg font-bold">
         All students <span className="text-muted">({students.length})</span>
-        {students.some((s) => s.completed >= mainDays.length) && (
+        {students.some((s) => s.reviewed >= mainDays.length) && (
           <span className="ml-2 text-sm font-semibold text-muted">
-            · {students.filter((s) => s.completed >= mainDays.length).length} completed the course
+            · {students.filter((s) => s.reviewed >= mainDays.length).length} completed the course
           </span>
         )}
       </h2>
@@ -110,9 +111,9 @@ export default function Students() {
       ) : loadError ? (
         <p className="font-semibold text-fri">{loadError}</p>
       ) : students.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-line p-8 text-center text-muted">No students yet. Add your first student above.</p>
+        <p className="rounded-lg border border-dashed border-line p-8 text-center text-muted">No students yet. Add your first student above.</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+        <div className="overflow-x-auto rounded-lg border border-line bg-surface">
           <table className="w-full min-w-[860px] border-collapse text-[15px]">
             <thead>
               <tr className="eyebrow text-left">
@@ -128,8 +129,8 @@ export default function Students() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-2 w-28 overflow-hidden rounded-full bg-sunk">
-                        <div className="h-full bg-ok" style={{ width: `${(s.completed / mainDays.length) * 100}%` }} />
+                      <div className="fle-progress-track w-28">
+                        <div className="fle-progress-fill fle-progress-primary" style={{ width: `${(s.completed / mainDays.length) * 100}%` }} />
                       </div>
                       <span className="font-mono text-xs tabular-nums">{s.completed}/{mainDays.length}</span>
                     </div>
@@ -137,19 +138,19 @@ export default function Students() {
                   <td className="px-4 py-3 text-sm">{formatDateTime(s.last_submitted_at)}</td>
                   <td className="px-4 py-3 text-sm">
                     {s.reviewed >= mainDays.length ? (
-                      <Link to="/admin/certificates" className="rounded-full bg-lime px-2.5 py-1 text-xs font-bold text-ink hover:brightness-95"
+                      <Link to="/admin/certificates" className="fle-tag fle-tag-lime hover:brightness-95"
                             title="Every main-course day has been reviewed. See their certificate.">
                         Course complete ✓
                       </Link>
                     ) : s.completed >= mainDays.length ? (
-                      <Link to="/admin/submissions" className="rounded-full bg-fri-soft px-2.5 py-1 text-xs font-bold text-fri hover:brightness-95"
+                      <Link to="/admin/submissions" className="fle-tag fle-tag-coral hover:brightness-95"
                             title="Their certificate is issued once every main-course day has feedback.">
                         Reviewed {s.reviewed}/{mainDays.length}
                       </Link>
                     ) : s.must_change_password ? (
-                      <span className="rounded-full bg-fri-soft px-2.5 py-1 text-xs font-bold text-fri">Hasn't signed in yet</span>
+                      <span className="fle-tag fle-tag-coral">Hasn't signed in yet</span>
                     ) : (
-                      <span className="rounded-full bg-sat-soft px-2.5 py-1 text-xs font-bold text-sat">In progress</span>
+                      <span className="fle-tag fle-tag-lime">In progress</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right text-sm font-semibold">

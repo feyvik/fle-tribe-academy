@@ -22,7 +22,7 @@ export function Orientation() {
   return (
     <div className="mt-12 grid gap-6">
       <h2 className="text-2xl font-extrabold">Career paths at a glance</h2>
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+      <div className="overflow-x-auto rounded-lg border border-line bg-surface">
         <table className="w-full min-w-[640px] border-collapse text-[15px]">
           <thead>
             <tr className="eyebrow text-left">
@@ -54,7 +54,7 @@ export function Orientation() {
       <h2 className="mt-4 text-2xl font-extrabold">Is it frontend?</h2>
       <div className="grid gap-3 md:grid-cols-3">
         {sorts.map((s) => (
-          <section key={s.name} className={`rounded-xl border border-line border-t-4 bg-surface p-5 ${s.tone}`}>
+          <section key={s.name} className={`rounded-lg border border-line border-t-4 bg-surface p-5 ${s.tone}`}>
             <h3 className="mb-2 text-base font-bold">{s.name}</h3>
             <ul className="list-disc space-y-1 pl-5">{s.items.map((item) => <li key={item}>{item}</li>)}</ul>
           </section>

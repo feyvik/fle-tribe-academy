@@ -38,12 +38,12 @@ export default function Certificates() {
           <div className="font-mono text-xs font-semibold uppercase tracking-[0.1em] text-lime">Your certificate is ready</div>
           <p className="mt-2 text-2xl font-extrabold">Congratulations, {c.full_name}.</p>
           <p className="mt-1 text-white/80">Certificate No: <b className="font-mono text-white">{c.number}</b></p>
-          <Link to={`/verify/${c.number}`} className="mt-4 inline-block rounded-lg bg-lime px-5 py-3 font-bold text-ink">View, download and share →</Link>
+          <Link to={`/verify/${c.number}`} className="mt-4 fle-btn fle-btn-win fle-btn-lg hover:brightness-95">View, download and share →</Link>
         </section>
       ))}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-xl border border-line bg-surface p-6">
+        <section className="rounded-lg border border-line bg-surface p-6">
           <h2 className="mb-3 text-lg font-bold">How to earn it</h2>
           <ol className="list-decimal space-y-1.5 pl-5">
             <li>Submit every lesson, assignment and reflection in the main course (Weeks 00–19). Each one unlocks the next. Bonus courses are optional.</li>
@@ -52,14 +52,14 @@ export default function Certificates() {
             <li>Get feedback on all your work. Once FLE TRIBE has reviewed every day, your certificate is issued automatically, emailed to you and shown on this page.</li>
           </ol>
         </section>
-        <section className="rounded-xl border border-line bg-surface p-6">
+        <section className="rounded-lg border border-line bg-surface p-6">
           <h2 className="mb-3 text-lg font-bold">Verify a certificate</h2>
           <form className="grid gap-3" onSubmit={find}>
             <label htmlFor="cert-number" className="text-sm font-semibold">Certificate number</label>
             <div className="flex flex-wrap gap-2">
               <input id="cert-number" autoComplete="off" placeholder="FTL26FE-001" value={number} onChange={(e) => setNumber(e.target.value)}
-                     className="min-w-0 flex-1 rounded-lg border border-line bg-bg px-3 py-2.5 font-mono uppercase" />
-              <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white hover:opacity-90">Verify</button>
+                     className="min-w-0 flex-1 fle-input font-mono uppercase" />
+              <button type="submit" className="fle-btn fle-btn-primary fle-btn-md">Verify</button>
             </div>
           </form>
         </section>

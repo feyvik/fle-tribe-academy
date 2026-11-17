@@ -99,14 +99,14 @@ export default function Login() {
             <p className="mt-8 text-sm text-muted">
               Accounts are created by FLE TRIBE when you join the program and
               sent to your email. If you haven't received your account details,
-              contact <a href="mailto:support@fletribe.org" className="text-accent underline hover:no-underline">
+              contact <a href="mailto:support@fletribe.org" className="inline-block py-1.5 text-accent underline hover:no-underline">
                 support@fletribe.org
               </a>
             </p>
 
             {!supabaseConfigured && (
               <p
-                className="mt-6 rounded-lg bg-fri-soft px-3 py-2 text-sm font-semibold text-fri"
+                className="mt-6 rounded-md bg-fri-soft px-3 py-2 text-sm font-semibold text-fri"
                 role="alert">
                 The app isn't connected to Supabase yet. Add VITE_SUPABASE_URL
                 and VITE_SUPABASE_ANON_KEY to the .env file.
@@ -124,7 +124,7 @@ export default function Login() {
                   autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="rounded-lg border border-line bg-surface px-3 py-2.5"
+                  className="fle-input"
                 />
               </div>
               <div className="grid gap-1.5">
@@ -134,7 +134,9 @@ export default function Login() {
                   </label>
                   <button
                     type="button"
-                    className="text-xs font-semibold text-accent"
+                    className="-my-2 -mr-2 inline-flex min-h-10 min-w-12 items-center justify-center px-2 text-sm font-semibold text-accent"
+                    aria-controls="password"
+                    aria-pressed={showPassword}
                     onClick={() => setShowPassword((s) => !s)}>
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -145,13 +147,13 @@ export default function Login() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="rounded-lg border border-line bg-surface px-3 py-2.5"
+                  className="fle-input"
                 />
               </div>
 
               {error && (
                 <p
-                  className="rounded-lg bg-fri-soft px-3 py-2 text-sm font-semibold text-fri"
+                  className="rounded-md bg-fri-soft px-3 py-2 text-sm font-semibold text-fri"
                   role="alert">
                   {error}
                 </p>
@@ -160,7 +162,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-lg bg-brand px-5 py-3 font-semibold text-white hover:opacity-90 disabled:opacity-60">
+                className="fle-btn fle-btn-primary fle-btn-lg">
                 {busy ? "Signing in…" : "Sign in"}
               </button>
             </form>

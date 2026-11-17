@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { Logo } from '../components/Logo';
+import { ThemedLogo } from '../components/Logo';
 import { useAuth } from '../lib/auth';
 import { errorText } from '../lib/supabase';
 
@@ -34,11 +34,11 @@ export default function ChangePassword() {
     }
   }
 
-  const field = 'rounded-lg border border-line bg-surface px-3 py-2.5';
+  const field = 'fle-input';
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
-        <Logo className="mb-10 h-12" />
+        <ThemedLogo className="mb-10 h-12" />
         <h1 className="text-3xl font-extrabold tracking-tight">Choose your password</h1>
         <p className="mt-2 text-muted">
           {profile.must_change_password
@@ -61,9 +61,9 @@ export default function ChangePassword() {
             <input id="confirm" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={field} />
           </div>
 
-          {error && <p className="rounded-lg bg-fri-soft px-3 py-2 text-sm font-semibold text-fri" role="alert">{error}</p>}
+          {error && <p className="rounded-md bg-fri-soft px-3 py-2 text-sm font-semibold text-fri" role="alert">{error}</p>}
 
-          <button type="submit" disabled={busy} className="rounded-lg bg-brand px-5 py-3 font-semibold text-white hover:opacity-90 disabled:opacity-60">
+          <button type="submit" disabled={busy} className="fle-btn fle-btn-primary fle-btn-lg">
             {busy ? 'Saving…' : 'Save password'}
           </button>
           {profile.must_change_password ? (

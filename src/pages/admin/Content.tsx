@@ -47,7 +47,7 @@ export default function Content() {
           const w = getWeek(id)!;
           return (
             <button key={id} type="button" role="tab" aria-selected={weekId === id} onClick={() => setWeekId(id)}
-                    className={`rounded-lg px-3 py-1.5 font-mono text-xs font-semibold ${weekId === id ? 'bg-brand text-white' : 'border border-line bg-surface hover:border-fg'}`}>
+                    className={`rounded-md px-3 py-1.5 font-mono text-xs font-semibold ${weekId === id ? 'bg-brand text-white' : 'border border-line bg-surface hover:border-fg'}`}>
               {shortLabel(w)} <span className="ml-1 opacity-70">{count(id)}/5</span>
             </button>
           );
@@ -56,7 +56,7 @@ export default function Content() {
 
       {error && <p className="mb-4 font-semibold text-fri">{error}</p>}
 
-      <section className="overflow-hidden rounded-xl border border-line bg-surface">
+      <section className="overflow-hidden rounded-lg border border-line bg-surface">
         <h2 className="border-b border-line px-4 py-3 text-lg font-bold">{weekHeading(week)}</h2>
         <div className="divide-y divide-line">
           {week.lessons.map((l) => (
@@ -151,7 +151,7 @@ function MediaRow({ lessonKey, day, title, media, onChange }: {
             <div className="font-bold">{title}</div>
             {media ? (
               <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
-                <span className="rounded-full bg-sat-soft px-2.5 py-0.5 text-xs font-bold text-sat">
+                <span className="fle-tag fle-tag-lime">
                   {media.kind === 'youtube' ? 'YouTube' : media.kind === 'video' ? 'Video file' : 'PDF'}
                 </span>
                 <button type="button" onClick={() => open(media)} className="truncate font-semibold text-accent hover:underline">{media.title || 'Open ↗'}</button>
@@ -162,12 +162,12 @@ function MediaRow({ lessonKey, day, title, media, onChange }: {
           </div>
           {!editing && (
             <div className="flex gap-2 text-sm font-semibold">
-              <button type="button" onClick={() => setEditing(true)} className="rounded-lg border border-line px-3 py-1.5 hover:border-fg">
+              <button type="button" onClick={() => setEditing(true)} className="rounded-md border border-line px-3 py-1.5 hover:border-fg">
                 {media ? 'Replace' : 'Add video or PDF'}
               </button>
               {media && (confirmRemove ? (
                 <>
-                  <button type="button" onClick={remove} className="rounded-lg bg-fri px-3 py-1.5 text-white">Confirm remove</button>
+                  <button type="button" onClick={remove} className="fle-btn fle-btn-sm bg-coral text-white hover:opacity-90">Confirm remove</button>
                   <button type="button" onClick={() => setConfirmRemove(false)} className="px-2 py-1.5 text-muted">Keep</button>
                 </>
               ) : (
@@ -178,7 +178,7 @@ function MediaRow({ lessonKey, day, title, media, onChange }: {
         </div>
 
         {editing && (
-          <div className="mt-4 grid gap-4 rounded-lg bg-sunk p-4">
+          <div className="mt-4 grid gap-4 rounded-md bg-sunk p-4">
             <div className="flex gap-1 text-sm font-semibold" role="tablist">
               <button type="button" role="tab" aria-selected={source === 'youtube'} onClick={() => setSource('youtube')} className={tab(source === 'youtube')}>YouTube link</button>
               <button type="button" role="tab" aria-selected={source === 'file'} onClick={() => setSource('file')} className={tab(source === 'file')}>Upload video or PDF</button>
@@ -186,25 +186,25 @@ function MediaRow({ lessonKey, day, title, media, onChange }: {
             <div className="grid gap-1.5">
               <label htmlFor={`${lessonKey}-title`} className="text-sm font-semibold">Title <span className="font-normal text-muted">(optional)</span></label>
               <input id={`${lessonKey}-title`} placeholder="e.g. How DNS works" value={mediaTitle} onChange={(e) => setMediaTitle(e.target.value)}
-                     className="rounded-lg border border-line bg-surface px-3 py-2" />
+                     className="fle-input" />
             </div>
             {source === 'youtube' ? (
               <div className="grid gap-1.5">
                 <label htmlFor={`${lessonKey}-url`} className="text-sm font-semibold">YouTube link</label>
                 <input id={`${lessonKey}-url`} placeholder="https://www.youtube.com/watch?v=…" value={url} onChange={(e) => setUrl(e.target.value)}
-                       className="rounded-lg border border-line bg-surface px-3 py-2" />
+                       className="fle-input" />
               </div>
             ) : (
               <div className="grid gap-1.5">
                 <label htmlFor={`${lessonKey}-file`} className="text-sm font-semibold">File</label>
                 <input id={`${lessonKey}-file`} type="file" accept="application/pdf,video/mp4,video/webm,video/quicktime" onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                       className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-2 file:font-semibold file:text-white" />
+                       className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-2 file:font-semibold file:text-white" />
                 <span className="text-xs text-muted">PDF, MP4, WebM or MOV. Large videos can take a few minutes; keep this page open.</span>
               </div>
             )}
             {error && <p className="m-0 text-sm font-semibold text-fri" role="alert">{error}</p>}
             <div className="flex gap-3">
-              <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+              <button type="button" onClick={save} disabled={busy} className="fle-btn fle-btn-primary fle-btn-sm">
                 {busy ? (source === 'file' ? 'Uploading…' : 'Saving…') : 'Save'}
               </button>
               <button type="button" onClick={() => { setEditing(false); setError(''); }} disabled={busy} className="text-sm font-semibold text-muted">Cancel</button>

@@ -86,18 +86,18 @@ export function SubmissionForm({
   const showForm = isAdmin || editing;
 
   return (
-    <section className="rounded-xl border-t-4 border-lime bg-surface p-5 shadow-sm ring-1 ring-line sm:p-6" aria-labelledby="answers-heading">
+    <section className="rounded-lg border-t-4 border-lime bg-surface p-5 shadow-sm ring-1 ring-line sm:p-6" aria-labelledby="answers-heading">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 id="answers-heading" className="text-2xl font-extrabold text-accent">{heading}</h2>
         {submission && !isAdmin && (
-          <span className={`rounded-full px-3 py-1 text-xs font-bold ${submission.reviewed_at ? 'bg-lime text-ink' : 'bg-accent-soft text-accent'}`}>
+          <span className={`fle-tag ${submission.reviewed_at ? 'fle-tag-lime' : 'fle-tag-primary'}`}>
             {submission.reviewed_at ? 'Reviewed' : 'Submitted · awaiting review'}
           </span>
         )}
       </div>
 
       {isAdmin && (
-        <p className="mb-5 rounded-lg bg-accent-soft px-4 py-3 text-sm">
+        <p className="mb-5 rounded-md bg-accent-soft px-4 py-3 text-sm">
           <b>Preview.</b> This is the form students fill in. Submitting completes the day and unlocks the next one. Admins can't submit.
         </p>
       )}
@@ -109,7 +109,7 @@ export function SubmissionForm({
               <div className="grid gap-1.5">
                 <label htmlFor="sub-link" className="font-semibold">Link to your work</label>
                 <input id="sub-link" type="url" placeholder="https://github.com/you/project" value={link}
-                       onChange={(e) => setLink(e.target.value)} className="rounded-lg border border-line bg-bg px-3 py-2.5 disabled:opacity-70" />
+                       onChange={(e) => setLink(e.target.value)} className="fle-input disabled:opacity-70" />
               </div>
             )}
 
@@ -121,12 +121,12 @@ export function SubmissionForm({
                 </label>
                 <textarea id={`answer-${i}`} rows={5} placeholder="Answer in your own words. You can paste links too." value={answers[i] ?? ''}
                           onChange={(e) => setAnswers((a) => a.map((v, j) => (j === i ? e.target.value : v)))}
-                          className="rounded-lg border border-line bg-bg px-3 py-2.5 leading-relaxed disabled:opacity-70" />
+                          className="fle-input fle-input-multi disabled:opacity-70" />
               </div>
             ))}
 
             {/* Optional links: GitHub repos, CodePens, articles that helped, screenshots… */}
-            <div className="grid gap-2 rounded-lg bg-sunk p-4">
+            <div className="grid gap-2 rounded-md bg-sunk p-4">
               <div>
                 <span className="font-semibold">{mode === 'assignment' ? 'More links' : 'Links'} <span className="font-normal text-muted">(optional)</span></span>
                 <p className="m-0 text-sm text-muted">Add up to {MAX_LINKS} links: your code on GitHub or CodePen, screenshots, or articles that helped you.</p>
@@ -136,27 +136,27 @@ export function SubmissionForm({
                   <label htmlFor={`extra-link-${i}`} className="sr-only">Link {i + 1}</label>
                   <input id={`extra-link-${i}`} type="url" placeholder="https://" value={l}
                          onChange={(e) => setLinks((all) => all.map((v, j) => (j === i ? e.target.value : v)))}
-                         className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 disabled:opacity-70" />
+                         className="min-w-0 flex-1 fle-input disabled:opacity-70" />
                   <button type="button" onClick={() => setLinks((all) => all.filter((_, j) => j !== i))}
-                          className="shrink-0 rounded-lg px-3 text-sm font-semibold text-fri hover:bg-fri-soft" aria-label={`Remove link ${i + 1}`}>
+                          className="shrink-0 rounded-md px-3 text-sm font-semibold text-fri hover:bg-fri-soft" aria-label={`Remove link ${i + 1}`}>
                     Remove
                   </button>
                 </div>
               ))}
               {links.length < MAX_LINKS && (
                 <button type="button" onClick={() => setLinks((all) => [...all, ''])}
-                        className="justify-self-start rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-semibold hover:border-fg">
+                        className="justify-self-start rounded-md border border-line bg-surface px-3 py-1.5 text-sm font-semibold hover:border-fg">
                   + Add a link
                 </button>
               )}
             </div>
           </fieldset>
 
-          {error && <p className="m-0 rounded-lg bg-fri-soft px-3 py-2 text-sm font-semibold text-fri" role="alert">{error}</p>}
+          {error && <p className="m-0 rounded-md bg-fri-soft px-3 py-2 text-sm font-semibold text-fri" role="alert">{error}</p>}
 
           {!isAdmin && (
             <div className="flex flex-wrap items-center gap-3">
-              <button type="submit" disabled={busy} className="rounded-lg bg-brand px-5 py-3 font-semibold text-white hover:opacity-90 disabled:opacity-60">
+              <button type="submit" disabled={busy} className="fle-btn fle-btn-primary fle-btn-lg">
                 {busy ? 'Submitting…' : submission ? 'Save changes' : 'Submit and unlock next lesson'}
               </button>
               {submission && <button type="button" className="font-semibold text-muted hover:text-fg" onClick={() => setEditing(false)}>Cancel</button>}
@@ -166,7 +166,7 @@ export function SubmissionForm({
       ) : submission ? (
         <>
           {justSubmitted && next && (
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-lime px-4 py-3 text-ink">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-md bg-lime px-4 py-3 text-ink">
               <span className="font-semibold">Submitted. {dayLabel(next.weekId, next.day)} is now unlocked.</span>
               <Link to={`/weeks/${next.weekId}/${next.day}`} className="font-bold underline">Go to it →</Link>
             </div>
@@ -192,7 +192,7 @@ export function SubmissionForm({
             )}
           </dl>
           {submission.feedback ? (
-            <div className="mt-5 rounded-lg bg-sat-soft p-4">
+            <div className="mt-5 rounded-md bg-sat-soft p-4">
               <div className="eyebrow mb-1 !text-sat">Feedback from FLE TRIBE</div>
               <p className="m-0 whitespace-pre-wrap"><Linkify text={submission.feedback} /></p>
             </div>

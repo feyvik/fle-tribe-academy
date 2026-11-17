@@ -13,7 +13,13 @@ interface IssuedRow {
   issued_on: string;
   emailed_at: string | null;
   program?: string | null;
+  record_id?: string | null;
+  /** Where the email goes: an app student's profile, or another program's student record. */
+  profiles?: { email: string } | null;
+  student_records?: { email: string | null } | null;
 }
+
+const emailOf = (c: IssuedRow) => c.profiles?.email ?? c.student_records?.email ?? null;
 
 /**
  * Certificates are issued and emailed automatically when a student's last main-course day gets feedback.
@@ -35,11 +41,12 @@ export default function CertificatesAdmin() {
     document.title = 'Certificates · Admin · FLE TRIBE';
     Promise.all([
       supabase.rpc('admin_students'),
-      supabase.from('certificates').select('number, user_id, full_name, issued_on, emailed_at, program').order('number', { ascending: false }),
+      supabase.from('certificates').select('number, user_id, full_name, issued_on, emailed_at, program, record_id, profiles(email), student_records(email)').order('number', { ascending: false }),
     ]).then(([s, c]) => {
       if (s.error || c.error) setError(errorText(s.error ?? c.error));
       setStudents((s.data ?? []) as StudentSummary[]);
-      setCerts((c.data ?? []) as IssuedRow[]);
+      // One certificate links to one profile or record, so these come back as single objects.
+      setCerts((c.data ?? []) as unknown as IssuedRow[]);
     });
   }, []);
 
@@ -56,7 +63,7 @@ export default function CertificatesAdmin() {
     const { data, error } = await supabase.rpc('issue_certificate', { p_user: studentId, p_date: date });
     setBusy(false);
     if (error) return setError(errorText(error));
-    const row = { ...(data as IssuedRow), user_id: studentId };
+    const row = { ...(data as IssuedRow), user_id: studentId, profiles: selected ? { email: selected.email } : null };
     setCerts((list) => [row, ...list]);
     setStudentId('');
     sendEmail(row);
@@ -64,15 +71,15 @@ export default function CertificatesAdmin() {
 
   /** Emails a student their certificate, or sends it again. */
   async function sendEmail(cert: IssuedRow) {
-    if (!cert.user_id) return;
+    if (!emailOf(cert)) return;
     setSending(cert.number);
     setError('');
     setNotice('');
     try {
-      const r = await adminUsers<CertificateSend>({ action: 'send_certificate', userId: cert.user_id, resend: true });
+      const r = await adminUsers<CertificateSend>({ action: 'send_certificate', number: cert.number, ...(cert.user_id ? { userId: cert.user_id } : {}), resend: true });
       if (r.emailed) {
         setCerts((list) => list.map((c) => (c.number === cert.number ? { ...c, emailed_at: new Date().toISOString() } : c)));
-        setNotice(`Certificate ${cert.number} emailed to ${cert.full_name}.`);
+        setNotice(`Certificate ${cert.number} emailed to ${cert.full_name} at ${emailOf(cert)}.`);
       } else {
         setError(`Certificate ${cert.number} wasn’t emailed. ${r.emailProblem ?? ''}`);
       }
@@ -90,14 +97,14 @@ export default function CertificatesAdmin() {
     setConfirmRevoke(null);
   }
 
-  const field = 'rounded-lg border border-line bg-bg px-3 py-2.5';
+  const field = 'fle-input';
   return (
     <>
       <PageHeader eyebrow="Admin" title="Certificates">
         When you give feedback on a student's last main-course day, their certificate is issued and emailed to them automatically. It also appears on their certificate page.
       </PageHeader>
 
-      <section className="mb-8 rounded-xl border border-line bg-surface p-5">
+      <section className="mb-8 rounded-lg border border-line bg-surface p-5">
         <h2 className="mb-4 text-lg font-bold">Issue one by hand</h2>
         <form className="grid gap-3 sm:grid-cols-[2fr_1fr_auto] sm:items-end" onSubmit={issue}>
           <div className="grid gap-1.5">
@@ -115,7 +122,7 @@ export default function CertificatesAdmin() {
             <label htmlFor="cert-date" className="text-sm font-semibold">Date on certificate</label>
             <input id="cert-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field} />
           </div>
-          <button type="submit" disabled={busy || !selected || !eligible(selected)} className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white hover:opacity-90 disabled:opacity-50">
+          <button type="submit" disabled={busy || !selected || !eligible(selected)} className="fle-btn fle-btn-primary fle-btn-md">
             {busy ? 'Issuing…' : 'Issue certificate'}
           </button>
         </form>
@@ -132,10 +139,10 @@ export default function CertificatesAdmin() {
 
       <h2 className="mb-3 text-lg font-bold">Issued <span className="text-muted">({certs.length})</span></h2>
       {certs.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-line p-8 text-center text-muted">No certificates issued yet.</p>
+        <p className="rounded-lg border border-dashed border-line p-8 text-center text-muted">No certificates issued yet.</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-          <table className="w-full min-w-[720px] border-collapse text-[15px]">
+        <div className="overflow-x-auto rounded-lg border border-line bg-surface">
+          <table className="w-full min-w-[820px] border-collapse text-[15px]">
             <thead><tr className="eyebrow text-left"><th className="px-4 py-3">Number</th><th className="px-4 py-3">Name</th><th className="px-4 py-3">Date</th><th className="px-4 py-3">Email</th><th className="px-4 py-3" /></tr></thead>
             <tbody>
               {certs.map((c) => (
@@ -147,15 +154,16 @@ export default function CertificatesAdmin() {
                   </td>
                   <td className="px-4 py-3">{certificateDate(c.issued_on)}</td>
                   <td className="px-4 py-3 text-sm">
-                    {c.user_id ? (
-                      <span className={`mr-2 font-semibold ${c.emailed_at ? 'text-sat' : 'text-fri'}`}>{c.emailed_at ? 'Sent' : 'Not sent'}</span>
+                    {emailOf(c) ? (
+                      <>
+                        <span className={`mr-2 font-semibold ${c.emailed_at ? 'text-sat' : 'text-fri'}`}>{c.emailed_at ? 'Sent' : 'Not sent'}</span>
+                        <button type="button" disabled={sending !== null} onClick={() => sendEmail(c)} className="font-semibold text-accent hover:underline disabled:opacity-60">
+                          {sending === c.number ? 'Sending…' : c.emailed_at ? 'Resend' : 'Send'}
+                        </button>
+                        <div className="text-muted">{emailOf(c)}</div>
+                      </>
                     ) : (
-                      <span className="text-muted" title="Issued outside the app, for another program">—</span>
-                    )}
-                    {c.user_id && (
-                      <button type="button" disabled={sending !== null} onClick={() => sendEmail(c)} className="font-semibold text-accent hover:underline disabled:opacity-60">
-                        {sending === c.number ? 'Sending…' : c.emailed_at ? 'Resend' : 'Send'}
-                      </button>
+                      <span className="text-muted" title="No email on record, so it can’t be emailed">N/A</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right text-sm font-semibold">

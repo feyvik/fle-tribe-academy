@@ -36,7 +36,7 @@ export default function WeekPage() {
     { day: 'sat', tone: 'sat', eyebrow: 'Weekly review', title: 'Progress & challenges', detail: `${w.review.questions.length} reflection questions` },
   ];
   const rowBg = { study: 'border border-line bg-surface shadow-sm', fri: 'border border-transparent bg-fri-soft', sat: 'border border-transparent bg-sat-soft' };
-  const dayPill = { study: 'bg-brand text-white', fri: 'bg-[#c23a37] text-white', sat: 'bg-lime text-ink' };
+  const dayPill = { study: 'bg-primary text-on-primary', fri: 'bg-coral text-white', sat: 'bg-lime text-ink' };
 
   return (
     <>
@@ -45,7 +45,10 @@ export default function WeekPage() {
       </PageHeader>
 
       {!progress.weekUnlocked(w.id) && (
-        <p className="mb-6 rounded-lg bg-sunk px-4 py-3 text-sm font-semibold">🔒 This week opens once you've submitted everything in the week before it.</p>
+        <div className="fle-callout fle-callout-heads-up mb-6">
+          <span className="fle-callout-label">🔒 Locked</span>
+          <span className="fle-callout-body">This week opens once you've submitted everything in the week before it.</span>
+        </div>
       )}
 
       <ol className="grid gap-3">
@@ -59,16 +62,16 @@ export default function WeekPage() {
             </>
           );
           return (
-            <li key={row.day} className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-xl p-4 sm:grid-cols-[96px_minmax(0,1fr)_auto] ${rowBg[row.tone]} ${open ? '' : 'opacity-60'}`}>
-              <span className={`w-14 rounded-md py-1 text-center font-mono text-xs font-bold tracking-wider ${dayPill[row.tone]}`}>{row.day.toUpperCase()}</span>
+            <li key={row.day} className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-lg p-4 sm:grid-cols-[96px_minmax(0,1fr)_auto] ${rowBg[row.tone]} ${open ? '' : 'opacity-60'}`}>
+              <span className={`w-14 rounded-sm py-1 text-center text-overline ${dayPill[row.tone]}`}>{row.day.toUpperCase()}</span>
               {open ? <Link to={row.day} className="group min-w-0">{text}</Link> : <div className="min-w-0">{text}</div>}
               <div className="col-span-2 sm:col-span-1">
                 {progress.isDone(w.id, row.day) ? (
-                  <span className="rounded-full bg-lime px-3 py-1 text-xs font-bold text-ink">✓ Submitted</span>
+                  <span className="fle-tag fle-tag-lime">✓ Submitted</span>
                 ) : open ? (
-                  <Link to={row.day} className="rounded-full bg-brand px-3 py-1 text-xs font-bold text-white">Open →</Link>
+                  <Link to={row.day} className="fle-btn fle-btn-primary fle-btn-sm">Open →</Link>
                 ) : (
-                  <span className="text-xs font-bold text-muted">🔒 Locked</span>
+                  <span className="fle-tag fle-tag-neutral">🔒 Locked</span>
                 )}
               </div>
             </li>
@@ -80,12 +83,12 @@ export default function WeekPage() {
 
       <nav className="mt-10 flex justify-between gap-3" aria-label="Weeks">
         {prev ? (
-          <Link to={`/weeks/${prev.id}`} className="rounded-lg border border-line bg-surface px-4 py-2.5 text-sm font-semibold hover:border-fg">← {weekLabel(prev)}</Link>
+          <Link to={`/weeks/${prev.id}`} className="fle-btn fle-btn-secondary fle-btn-md">← {weekLabel(prev)}</Link>
         ) : <span />}
         {next && (progress.weekUnlocked(next.id) ? (
-          <Link to={`/weeks/${next.id}`} className="rounded-lg border border-line bg-surface px-4 py-2.5 text-sm font-semibold hover:border-fg">{weekLabel(next)} →</Link>
+          <Link to={`/weeks/${next.id}`} className="fle-btn fle-btn-secondary fle-btn-md">{weekLabel(next)} →</Link>
         ) : (
-          <span className="rounded-lg border border-dashed border-line px-4 py-2.5 text-sm font-semibold text-muted">🔒 {weekLabel(next)}</span>
+          <span className="rounded-md border border-dashed border-line px-4 py-2.5 text-sm font-semibold text-muted">🔒 {weekLabel(next)}</span>
         ))}
       </nav>
     </>
