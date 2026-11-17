@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { StudentRecord } from '../../data/models';
 import { certificateDate, formatDateTime } from '../../lib/course';
 import { errorText, supabase } from '../../lib/supabase';
+import { Pagination, usePagination } from '../../components/Pagination';
 
 interface RecordCertificate {
   number: string;
@@ -37,6 +38,7 @@ export function OtherPrograms() {
   const programs = useMemo(() => ['All', ...new Set(records.map((r) => r.program))], [records]);
   const shown = program === 'All' ? records : records.filter((r) => r.program === program);
   const certificateFor = (id: string) => certs.find((c) => c.record_id === id);
+  const pager = usePagination(shown, 10, program);
 
   if (loading) return null;
   if (error) {
@@ -75,7 +77,7 @@ export function OtherPrograms() {
             </tr>
           </thead>
           <tbody>
-            {shown.map((r) => {
+            {pager.pageItems.map((r) => {
               const cert = certificateFor(r.id);
               return (
                 <Fragment key={r.id}>
@@ -124,6 +126,7 @@ export function OtherPrograms() {
           </tbody>
         </table>
       </div>
+      <Pagination {...pager} label="Other programs" />
     </section>
   );
 }

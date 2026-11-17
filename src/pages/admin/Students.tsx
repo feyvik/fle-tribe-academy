@@ -5,6 +5,7 @@ import { mainDays, formatDateTime } from '../../lib/course';
 import { adminUsers, errorText, supabase } from '../../lib/supabase';
 import { CredentialsCard, type SignInDetails } from './shared';
 import { PageHeader } from '../../components/PageHeader';
+import { Pagination, usePagination } from '../../components/Pagination';
 import { OtherPrograms } from './OtherPrograms';
 
 /** Add students (there is no public sign-up) and see everyone's progress. */
@@ -19,6 +20,7 @@ export default function Students() {
   const [created, setCreated] = useState<(SignInDetails & { name: string }) | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const pager = usePagination(students, 10);
 
   async function load() {
     const { data, error } = await supabase.rpc('admin_students');
@@ -118,7 +120,7 @@ export default function Students() {
               </tr>
             </thead>
             <tbody>
-              {students.map((s) => (
+              {pager.pageItems.map((s) => (
                 <tr key={s.id} className="border-t border-line align-middle hover:bg-sunk">
                   <td className="px-4 py-3">
                     <Link to={s.id} className="font-semibold hover:text-accent">{s.full_name}</Link>
@@ -169,6 +171,7 @@ export default function Students() {
           </table>
         </div>
       )}
+      <Pagination {...pager} label="Students" />
 
       <OtherPrograms />
     </>
