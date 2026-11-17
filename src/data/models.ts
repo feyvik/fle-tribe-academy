@@ -84,6 +84,26 @@ export interface Certificate {
   full_name: string;
   /** ISO date, e.g. '2026-11-30'. */
   issued_on: string;
+  /** Set for certificates from other programs, e.g. 'Data Analysis Program'. Empty means the Frontend Developer Program. */
+  program?: string | null;
+  /** e.g. '4 month'. Empty means the learning app's own length. */
+  duration?: string | null;
+  /** Partner whose logo is shown, e.g. 'Startup Graveyard'. */
+  partner?: string | null;
+}
+
+/** A student on another FLE TRIBE program (no login to this app), kept for records and certificate verification. */
+export interface StudentRecord {
+  id: string;
+  full_name: string;
+  email: string | null;
+  phone: string | null;
+  program: string;
+  joined_at: string | null;
+  heard_from: string | null;
+  reason: string | null;
+  headshot_url: string | null;
+  notes: string | null;
 }
 
 export interface StudentSummary {

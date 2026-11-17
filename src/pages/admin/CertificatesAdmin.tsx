@@ -12,6 +12,7 @@ interface IssuedRow {
   full_name: string;
   issued_on: string;
   emailed_at: string | null;
+  program?: string | null;
 }
 
 /**
@@ -34,7 +35,7 @@ export default function CertificatesAdmin() {
     document.title = 'Certificates · Admin · FLE TRIBE';
     Promise.all([
       supabase.rpc('admin_students'),
-      supabase.from('certificates').select('number, user_id, full_name, issued_on, emailed_at').order('number', { ascending: false }),
+      supabase.from('certificates').select('number, user_id, full_name, issued_on, emailed_at, program').order('number', { ascending: false }),
     ]).then(([s, c]) => {
       if (s.error || c.error) setError(errorText(s.error ?? c.error));
       setStudents((s.data ?? []) as StudentSummary[]);
@@ -140,10 +141,17 @@ export default function CertificatesAdmin() {
               {certs.map((c) => (
                 <tr key={c.number} className="border-t border-line">
                   <td className="px-4 py-3 font-mono font-semibold">{c.number}</td>
-                  <td className="px-4 py-3">{c.full_name}</td>
+                  <td className="px-4 py-3">
+                    {c.full_name}
+                    {c.program && <div className="text-sm text-muted">{c.program}</div>}
+                  </td>
                   <td className="px-4 py-3">{certificateDate(c.issued_on)}</td>
                   <td className="px-4 py-3 text-sm">
-                    <span className={`mr-2 font-semibold ${c.emailed_at ? 'text-sat' : 'text-fri'}`}>{c.emailed_at ? 'Sent' : 'Not sent'}</span>
+                    {c.user_id ? (
+                      <span className={`mr-2 font-semibold ${c.emailed_at ? 'text-sat' : 'text-fri'}`}>{c.emailed_at ? 'Sent' : 'Not sent'}</span>
+                    ) : (
+                      <span className="text-muted" title="Issued outside the app, for another program">—</span>
+                    )}
                     {c.user_id && (
                       <button type="button" disabled={sending !== null} onClick={() => sendEmail(c)} className="font-semibold text-accent hover:underline disabled:opacity-60">
                         {sending === c.number ? 'Sending…' : c.emailed_at ? 'Resend' : 'Send'}

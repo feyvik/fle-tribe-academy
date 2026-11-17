@@ -5,6 +5,7 @@ import { mainDays, formatDateTime } from '../../lib/course';
 import { adminUsers, errorText, supabase } from '../../lib/supabase';
 import { CredentialsCard, type SignInDetails } from './shared';
 import { PageHeader } from '../../components/PageHeader';
+import { OtherPrograms } from './OtherPrograms';
 
 /** Add students (there is no public sign-up) and see everyone's progress. */
 export default function Students() {
@@ -168,6 +169,8 @@ export default function Students() {
           </table>
         </div>
       )}
+
+      <OtherPrograms />
     </>
   );
 }
